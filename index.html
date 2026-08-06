@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dual Shock Live - Scegli la Scaletta</title>
+  <title>Dual Shock Live - Richiesta Brani</title>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #fff; margin: 0; padding: 20px; }
     .container { max-width: 600px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
@@ -24,7 +24,7 @@
 
   <div class="container">
     <h1>🎸 DUAL SHOCK LIVE</h1>
-    <p class="subtitle">Scegli la prossima canzone o inviaci una dedica!</p>
+    <p class="subtitle">Scegli la canzone che vorresti sentire stasera!</p>
 
     <div class="form-group">
       <label for="userName">Il tuo nome:</label>
@@ -32,24 +32,44 @@
     </div>
 
     <div class="form-group">
-      <label for="songSelect">Scegli un brano:</label>
+      <label for="songSelect">Scegli un brano dalla scaletta:</label>
       <select id="songSelect">
         <option value="">-- Seleziona una canzone --</option>
-        <option value="Wish You Were Here - Pink Floyd">Wish You Were Here - Pink Floyd</option>
-        <option value="Hotel California - Eagles">Hotel California - Eagles</option>
-        <option value="Sweet Home Alabama - Lynyrd Skynyrd">Sweet Home Alabama - Lynyrd Skynyrd</option>
-        <option value="Sultans of Swing - Dire Straits">Sultans of Swing - Dire Straits</option>
-        <option value="Knockin' on Heaven's Door - Bob Dylan">Knockin' on Heaven's Door - Bob Dylan</option>
-        <option value="Altro / Dedica Libera">Altro (scrivi nelle note)</option>
+        <option value="A Mano a Mano">A Mano a Mano</option>
+        <option value="Ain't No Sunshine">Ain't No Sunshine</option>
+        <option value="Back to Black">Back to Black</option>
+        <option value="Bad Moon Rising">Bad Moon Rising</option>
+        <option value="Basket Case">Basket Case</option>
+        <option value="Bohemian Rhapsody">Bohemian Rhapsody</option>
+        <option value="Come As You Are">Come As You Are</option>
+        <option value="Creep">Creep</option>
+        <option value="Don't Stop Me Now">Don't Stop Me Now</option>
+        <option value="Everybody Needs Somebody To Love">Everybody Needs Somebody To Love</option>
+        <option value="Hey Jude">Hey Jude</option>
+        <option value="Il Tempo di Morire">Il Tempo di Morire</option>
+        <option value="Imagine">Imagine</option>
+        <option value="Knockin' on Heaven's Door">Knockin' on Heaven's Door</option>
+        <option value="Let It Be">Let It Be</option>
+        <option value="Personal Jesus">Personal Jesus</option>
+        <option value="Purple Rain">Purple Rain</option>
+        <option value="Radioactive">Radioactive</option>
+        <option value="Rehab">Rehab</option>
+        <option value="Stand By Me">Stand By Me</option>
+        <option value="Sweet Home Alabama">Sweet Home Alabama</option>
+        <option value="Thunderstruck">Thunderstruck</option>
+        <option value="Vita Spericolata">Vita Spericolata</option>
+        <option value="Whole Lotta Love">Whole Lotta Love</option>
+        <option value="Wonderwall">Wonderwall</option>
+        <option value="You Never Can Tell">You Never Can Tell</option>
       </select>
     </div>
 
     <div class="form-group">
-      <label for="userMessage">Messaggio / Dedica (Opzionale):</label>
-      <textarea id="userMessage" rows="3" placeholder="Scrivi un messaggio per la band..."></textarea>
+      <label for="userMessage">Dedica o messaggio per la band (Opzionale):</label>
+      <textarea id="userMessage" rows="3" placeholder="Scrivi un messaggio..."></textarea>
     </div>
 
-    <button onclick="sendRequest()">INVIA SULLO SCHERMO DELLA BAND</button>
+    <button onclick="sendRequest()">INVIA SUL PALCO</button>
 
     <div id="successMessage" class="success-msg">
       ✨ Richiesta inviata sul palco! Grazie!
@@ -77,17 +97,17 @@
       const message = document.getElementById('userMessage').value.trim();
 
       if (!name) {
-        alert("Inserisci il tuo nome per favore!");
+        alert("Inserisci il tuo nome!");
         return;
       }
-      if (!song && !message) {
-        alert("Scegli un brano o scrivi un messaggio!");
+      if (!song) {
+        alert("Seleziona una canzone dalla lista!");
         return;
       }
 
       const requestData = {
         name: name,
-        song: song || "Nessun brano selezionato",
+        song: song,
         message: message || "",
         timestamp: Date.now()
       };
