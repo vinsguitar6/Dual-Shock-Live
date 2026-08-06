@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dual Shock - Dashboard Palco</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d0d0d; color: #fff; margin: 0; padding: 20px; }
+    h1 { text-align: center; color: #ff9800; font-size: 2em; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+    #requestsContainer { display: flex; flex-direction: column-reverse; gap: 15px; max-width: 800px; margin: 0 auto; }
+    .card { background: #1a1a1a; border-left: 6px solid #ff9800; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.7); position: relative; animation: fadeIn 0.4s ease-in-out; }
+    .card-header { font-size: 1.1em; color: #888; margin-bottom: 8px; display: flex; justify-content: space-between; }
+    .user-name { font-weight: bold; color: #ff9800; font-size: 1.3em; }
+    .song-title { font-size: 1.5em; font-weight: bold; color: #ffffff; margin: 10px 0; }
+    .user-message { font-size: 1.2em; color: #ddd; background: #262626; padding: 12px; border-radius: 6px; font-style: italic; }
+    .delete-btn { position: absolute; top: 15px; right: 15px; background: #d32f2f; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+</head>
+<body>
+
+  <h1>📱 DUAL SHOCK - RICHIESTE DAL VIVO</h1>
+  <div id="requestsContainer"></div>
+
+  <script>
+    // INCOLLA QUI LE TUE CHIAVI FIREBASE
+    const firebaseConfig = {
+      apiKey: "TUA_API_KEY",
+      authDomain: "TUO_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://TUO_PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "TUO_PROJECT_ID",
+      storageBucket: "TUO_PROJECT_ID.appspot.com",
+      messagingSenderId: "TUO_SENDER_ID",
+      appId: "TUO_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    database.ref('requests').on('value', (snapshot) => {
+      const container = document.getElementById('requestsContainer');
+      container.innerHTML = '';
+      const data = snapshot.val();
+
+      if (!data) {
+        container.innerHTML = '<p style="text-align:center; color:#666; font-size:1.2em;">In attesa di richieste dal pubblico...</p>';
+        return;
+      }
+
+      Object.keys(data).forEach((key) => {
+        const item = data[key];
+        const time = new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="card-header">
+            <span class="user-name">👤 ${item.name}</span>
+            <span>🕒 ${time}</span>
+          </div>
+          <div class="song-title">🎵 ${item.song}</div>
+          ${item.message ? `<div class="user-message">💬 "${item.message}"</div>` : ''}
+          <button class="delete-btn" onclick="removeRequest('${key}')">FATTA / RIMOVI</button>
+        `;
+        container.appendChild(card);
+      });
+    });
+
+    function removeRequest(key) {
+      database.ref('requests/' + key).remove();
+    }
+  </script>
+</body>
+</html>
