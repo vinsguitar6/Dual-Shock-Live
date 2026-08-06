@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dual Shock Live - Scegli la Scaletta</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #fff; margin: 0; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: #1e1e1e; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    h1 { text-align: center; color: #ff9800; margin-bottom: 5px; }
+    p.subtitle { text-align: center; color: #aaa; margin-bottom: 25px; font-size: 0.9em; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; color: #ddd; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #2a2a2a; color: #fff; box-sizing: border-box; font-size: 1em; }
+    button { width: 100%; padding: 15px; border: none; border-radius: 8px; background: #ff9800; color: #121212; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+    button:hover { background: #e68a00; }
+    .success-msg { display: none; text-align: center; padding: 15px; background: #2e7d32; color: #fff; border-radius: 8px; margin-top: 15px; font-weight: bold; }
+  </style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🎸 DUAL SHOCK LIVE</h1>
+    <p class="subtitle">Scegli la prossima canzone o inviaci una dedica!</p>
+
+    <div class="form-group">
+      <label for="userName">Il tuo nome:</label>
+      <input type="text" id="userName" placeholder="Es. Marco" required>
+    </div>
+
+    <div class="form-group">
+      <label for="songSelect">Scegli un brano:</label>
+      <select id="songSelect">
+        <option value="">-- Seleziona una canzone --</option>
+        <option value="Wish You Were Here - Pink Floyd">Wish You Were Here - Pink Floyd</option>
+        <option value="Hotel California - Eagles">Hotel California - Eagles</option>
+        <option value="Sweet Home Alabama - Lynyrd Skynyrd">Sweet Home Alabama - Lynyrd Skynyrd</option>
+        <option value="Sultans of Swing - Dire Straits">Sultans of Swing - Dire Straits</option>
+        <option value="Knockin' on Heaven's Door - Bob Dylan">Knockin' on Heaven's Door - Bob Dylan</option>
+        <option value="Altro / Dedica Libera">Altro (scrivi nelle note)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="userMessage">Messaggio / Dedica (Opzionale):</label>
+      <textarea id="userMessage" rows="3" placeholder="Scrivi un messaggio per la band..."></textarea>
+    </div>
+
+    <button onclick="sendRequest()">INVIA SULLO SCHERMO DELLA BAND</button>
+
+    <div id="successMessage" class="success-msg">
+      ✨ Richiesta inviata sul palco! Grazie!
+    </div>
+  </div>
+
+  <script>
+    // INCOLLA QUI LE TUE CHIAVI FIREBASE
+    const firebaseConfig = {
+      apiKey: "TUA_API_KEY",
+      authDomain: "TUO_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://TUO_PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "TUO_PROJECT_ID",
+      storageBucket: "TUO_PROJECT_ID.appspot.com",
+      messagingSenderId: "TUO_SENDER_ID",
+      appId: "TUO_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    function sendRequest() {
+      const name = document.getElementById('userName').value.trim();
+      const song = document.getElementById('songSelect').value;
+      const message = document.getElementById('userMessage').value.trim();
+
+      if (!name) {
+        alert("Inserisci il tuo nome per favore!");
+        return;
+      }
+      if (!song && !message) {
+        alert("Scegli un brano o scrivi un messaggio!");
+        return;
+      }
+
+      const requestData = {
+        name: name,
+        song: song || "Nessun brano selezionato",
+        message: message || "",
+        timestamp: Date.now()
+      };
+
+      database.ref('requests').push(requestData).then(() => {
+        document.getElementById('userName').value = '';
+        document.getElementById('songSelect').value = '';
+        document.getElementById('userMessage').value = '';
+        
+        const msg = document.getElementById('successMessage');
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 4000);
+      });
+    }
+  </script>
+</body>
+</html>
