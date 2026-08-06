@@ -3,30 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dual Shock - Dashboard Palco</title>
+  <title>Palco Band - Dashboard Live</title>
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d0d0d; color: #fff; margin: 0; padding: 20px; }
-    h1 { text-align: center; color: #ff9800; font-size: 2em; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
-    #requestsContainer { display: flex; flex-direction: column-reverse; gap: 15px; max-width: 800px; margin: 0 auto; }
-    .card { background: #1a1a1a; border-left: 6px solid #ff9800; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.7); position: relative; animation: fadeIn 0.4s ease-in-out; }
-    .card-header { font-size: 1.1em; color: #888; margin-bottom: 8px; display: flex; justify-content: space-between; }
-    .user-name { font-weight: bold; color: #ff9800; font-size: 1.3em; }
-    .song-title { font-size: 1.5em; font-weight: bold; color: #ffffff; margin: 10px 0; }
-    .user-message { font-size: 1.2em; color: #ddd; background: #262626; padding: 12px; border-radius: 6px; font-style: italic; }
-    .delete-btn { position: absolute; top: 15px; right: 15px; background: #d32f2f; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    body { font-family: sans-serif; background: #000; color: #fff; padding: 20px; text-align: center; }
+    .card { background: #1a1a1a; border: 3px solid #ff9800; border-radius: 15px; padding: 30px; margin-top: 20px; }
+    .title { font-size: 2.5em; color: #ff9800; font-weight: bold; margin-bottom: 10px; }
+    .artist { font-size: 1.8em; color: #ccc; }
+    .dedica { font-size: 1.5em; color: #00e676; margin-top: 20px; font-style: italic; }
+    .suggeriti { margin-top: 40px; text-align: left; background: #111; padding: 15px; border-radius: 10px; }
+    .top-song { color: #ff9800; font-weight: bold; font-size: 1.2em; margin-bottom: 8px; }
   </style>
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 </head>
 <body>
 
-  <h1>📱 DUAL SHOCK - RICHIESTE DAL VIVO</h1>
-  <div id="requestsContainer"></div>
+  <h1>PROSSIMO BRANO DA SUONARE</h1>
 
-  <script>
-    // INCOLLA QUI LE TUE CHIAVI FIREBASE
+  <div class="card">
+    <div id="live-title" class="title">In attesa di richieste...</div>
+    <div id="live-artist" class="artist"></div>
+    <div id="live-dedica" class="dedica"></div>
+  </div>
+
+  <div class="suggeriti">
+    <h2>Brani Proposti pronti per la Scaletta (≥ 10 Voti)</h2>
+    <div id="goals-list">Nessun brano ha ancora raggiunto 10 voti.</div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // INCOLLA QUI LE STESSE CHIAVI FIREBASE
     const firebaseConfig = {
       apiKey: "TUA_API_KEY",
       authDomain: "TUO_PROJECT_ID.firebaseapp.com",
@@ -37,41 +44,36 @@
       appId: "TUO_APP_ID"
     };
 
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-    database.ref('requests').on('value', (snapshot) => {
-      const container = document.getElementById('requestsContainer');
-      container.innerHTML = '';
+    // Ascolta la scelta del pubblico in tempo reale
+    onValue(ref(db, 'richiesta_live'), (snapshot) => {
       const data = snapshot.val();
-
-      if (!data) {
-        container.innerHTML = '<p style="text-align:center; color:#666; font-size:1.2em;">In attesa di richieste dal pubblico...</p>';
-        return;
+      if(data) {
+        document.getElementById('live-title').innerText = data.titolo;
+        document.getElementById('live-artist').innerText = "di " + data.artista;
+        document.getElementById('live-dedica').innerText = data.dedica ? "Dedica: " + data.dedica : "";
       }
-
-      Object.keys(data).forEach((key) => {
-        const item = data[key];
-        const time = new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <div class="card-header">
-            <span class="user-name">👤 ${item.name}</span>
-            <span>🕒 ${time}</span>
-          </div>
-          <div class="song-title">🎵 ${item.song}</div>
-          ${item.message ? `<div class="user-message">💬 "${item.message}"</div>` : ''}
-          <button class="delete-btn" onclick="removeRequest('${key}')">FATTA / RIMOVI</button>
-        `;
-        container.appendChild(card);
-      });
     });
 
-    function removeRequest(key) {
-      database.ref('requests/' + key).remove();
-    }
+    // Ascolta i brani che raggiungono i 10 voti
+    onValue(ref(db, 'proposte'), (snapshot) => {
+      const data = snapshot.val();
+      const list = document.getElementById('goals-list');
+      list.innerHTML = '';
+      let pronti = false;
+
+      if(data) {
+        Object.keys(data).forEach(id => {
+          if(data[id].voti >= 10) {
+            pronti = true;
+            list.innerHTML += `<div class="top-song">🔥 ${data[id].titolo} - ${data[id].artista} (${data[id].voti} Voti)</div>`;
+          }
+        });
+      }
+      if(!pronti) list.innerHTML = 'Nessun brano ha ancora raggiunto 10 voti.';
+    });
   </script>
 </body>
 </html>
