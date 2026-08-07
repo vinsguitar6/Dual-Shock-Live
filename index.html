@@ -28,7 +28,8 @@
     button:active { opacity: 0.8; }
     button:disabled { background: #555; color: #888; cursor: not-allowed; opacity: 0.6; }
     
-    .social-section { margin-top: 25px; padding-top: 15px; border-top: 1px solid #333; text-align: center; }
+    /* Sezione Social in alto */
+    .social-section { margin-bottom: 25px; padding: 15px; background: var(--card); border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
     .social-section p { color: var(--subtext); font-size: 0.9em; margin-bottom: 12px; font-weight: bold; }
     .social-icons { display: flex; justify-content: center; gap: 15px; }
     .social-btn { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; color: #fff; text-decoration: none; font-size: 1.4em; }
@@ -59,17 +60,18 @@
     <input type="text" id="dedica" placeholder="Es. Per Anna">
   </div>
 
-  <div class="section">
-    <h2>Scaletta Brani</h2>
-    <div id="song-list"></div>
-  </div>
-
+  <!-- SEZIONE SOCIAL IN ALTO -->
   <div class="social-section">
     <p>Seguiteci sui nostri canali social!</p>
     <div class="social-icons">
       <a href="https://www.instagram.com/dual_shock_duo?igsh=MTRjdmVvMTl1MzNhdw%3D%3D&utm_source=qr" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
       <a href="https://www.facebook.com/share/18HKLuiHnc/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
     </div>
+  </div>
+
+  <div class="section">
+    <h2>Scaletta Brani</h2>
+    <div id="song-list"></div>
   </div>
 
   <script type="module">
@@ -184,7 +186,6 @@
     const countdownEl = document.getElementById('countdown');
     let timerInterval = null;
 
-    // Generazione dinamica della lista
     brani.forEach((b) => {
       const item = document.createElement('div');
       item.className = 'song-item';
@@ -198,7 +199,6 @@
       listContainer.appendChild(item);
     });
 
-    // Gestione Timer e Conto alla Rovescia
     function updateTimer() {
       const lastRequest = localStorage.getItem('last_song_request_time');
       if (!lastRequest) {
@@ -230,7 +230,6 @@
       buttons.forEach(btn => btn.disabled = disabled);
     }
 
-    // Avvia controllo timer all'apertura
     updateTimer();
     timerInterval = setInterval(updateTimer, 1000);
 
@@ -242,7 +241,6 @@
         return;
       }
 
-      // Controllo di sicurezza aggiuntivo prima dell'invio
       const lastRequest = localStorage.getItem('last_song_request_time');
       if (lastRequest && (Date.now() - parseInt(lastRequest, 10) < COOLDOWN_MS)) {
         alert('⏳ Hai già inviato una richiesta! Attendi lo scadere del timer in alto.');
