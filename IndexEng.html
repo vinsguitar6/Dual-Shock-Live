@@ -21,8 +21,7 @@
     input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; box-sizing: border-box; }
     button { background: var(--primary); color: #000; font-weight: bold; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
     button:active { opacity: 0.8; }
-    .suggest-item { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding: 8px; background: #2a2a2a; border-radius: 6px; }
-    .badge { background: #333; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; color: var(--primary); }
+    .suggest-item { margin-top: 10px; padding: 10px; background: #2a2a2a; border-radius: 6px; }
     
     .social-section { margin-top: 25px; padding-top: 15px; border-top: 1px solid #333; text-align: center; }
     .social-section p { color: var(--subtext); font-size: 0.9em; margin-bottom: 12px; font-weight: bold; }
@@ -56,7 +55,7 @@
 
   <div class="section">
     <h2>Suggest for Future Shows</h2>
-    <p class="sub">Suggest a song! Once it gets 5 votes, we'll learn it for our next gigs.</p>
+    <p class="sub">Suggest a song! We will consider it for our next shows.</p>
     <input type="text" id="new-song-title" placeholder="Song Title">
     <input type="text" id="new-song-artist" placeholder="Artist">
     <button onclick="proponiBrano()" style="width: 100%; margin-top: 5px;">Submit Song</button>
@@ -74,7 +73,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDqH7id1aRXulq9CfVjLn9TDu4QYX9Paao",
@@ -217,8 +216,8 @@
       
       push(ref(db, 'proposte'), { 
         titolo: t, 
-        artista: a, 
-        voti: 1 
+        artista: a,
+        timestamp: Date.now()
       }).then(() => {
         alert('💡 Song suggestion submitted!');
         document.getElementById('new-song-title').value = '';
@@ -239,21 +238,13 @@
             const div = document.createElement('div');
             div.className = 'suggest-item';
             div.innerHTML = `
-              <div>
-                <strong>${item.titolo}</strong> - ${item.artista}<br>
-                <span class="badge">${item.voti || 1} / 5 Votes</span>
-              </div>
-              <button onclick="vota('${id}', ${item.voti || 1})">+1 Vote</button>
+              <strong>🎵 ${item.titolo}</strong> - ${item.artista}
             `;
             cont.appendChild(div);
           }
         });
       }
     });
-
-    window.vota = (id, votiAttuali) => {
-      update(ref(db, `proposte/${id}`), { voti: votiAttuali + 1 });
-    };
   </script>
 </body>
 </html>
