@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scegli il brano dal vivo</title>
+  <title>Scegli il brano dal vivo - Dual Shock</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root { --bg: #121212; --card: #1e1e1e; --primary: #ff9800; --text: #ffffff; --subtext: #aaa; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
@@ -15,21 +16,31 @@
     .song-info { display: flex; flex-direction: column; }
     .song-title { font-weight: bold; font-size: 1em; }
     .song-artist { font-size: 0.85em; color: var(--subtext); }
-    input[type="text"] { width: 100%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; box-sizing: border-box; }
+    input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; box-sizing: border-box; }
     button { background: var(--primary); color: #000; font-weight: bold; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
     button:active { opacity: 0.8; }
     .suggest-item { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding: 8px; background: #2a2a2a; border-radius: 6px; }
     .badge { background: #333; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; color: var(--primary); }
+    
+    .social-section { margin-top: 25px; padding-top: 15px; border-top: 1px solid #333; text-align: center; }
+    .social-section p { color: var(--subtext); font-size: 0.9em; margin-bottom: 12px; font-weight: bold; }
+    .social-icons { display: flex; justify-content: center; gap: 15px; }
+    .social-btn { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; color: #fff; text-decoration: none; font-size: 1.4em; }
+    .instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+    .facebook { background: #1877f2; }
   </style>
 </head>
 <body>
 
-  <h1>Scegli la Canzone Live</h1>
-  <p class="sub">Seleziona il brano che vuoi sentirci suonare adesso!</p>
+  <h1>🎸 DUAL SHOCK LIVE</h1>
+  <p class="sub">Seleziona il brano che vuoi sentirci suonare stasera!</p>
 
   <div class="section">
-    <label for="dedica" style="font-weight: bold;">Dedica la canzone a qualcuno (opzionale):</label>
-    <input type="text" id="dedica" placeholder="Es. Per Marco da parte di Anna">
+    <label for="userName" style="font-weight: bold; color: var(--primary);">Il tuo Nome:</label>
+    <input type="text" id="userName" placeholder="Es. Marco">
+    
+    <label for="dedica" style="font-weight: bold; margin-top: 10px; display: block;">Dedica o messaggio (opzionale):</label>
+    <input type="text" id="dedica" placeholder="Es. Per Anna">
   </div>
 
   <div class="section">
@@ -39,7 +50,7 @@
 
   <div class="section">
     <h2>Proponi per i prossimi Live</h2>
-    <p class="sub">Proponi un brano! Se raggiunge 10 voti lo impareremo per il prossimo show.</p>
+    <p class="sub">Proponi un brano! Se raggiunge 10 voti lo impareremo per i prossimi show.</p>
     <input type="text" id="new-song-title" placeholder="Titolo Brano">
     <input type="text" id="new-song-artist" placeholder="Artista">
     <button onclick="proponiBrano()" style="width: 100%; margin-top: 5px;">Invia Proposta</button>
@@ -47,9 +58,17 @@
     <div id="proposte-list" style="margin-top: 15px;"></div>
   </div>
 
+  <div class="social-section">
+    <p>Seguiteci sui nostri canali social!</p>
+    <div class="social-icons">
+      <a href="https://www.instagram.com/dual_shock_duo?igsh=MTRjdmVvMTl1MzNhdw%3D%3D&utm_source=qr" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
+      <a href="https://www.facebook.com/share/18HKLuiHnc/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDqH7id1aRXulq9CfVjLn9TDu4QYX9Paao",
@@ -149,7 +168,7 @@
     ];
 
     const listContainer = document.getElementById('song-list');
-    brani.forEach((b, index) => {
+    brani.forEach((b) => {
       const item = document.createElement('div');
       item.className = 'song-item';
       item.innerHTML = `
@@ -163,15 +182,25 @@
     });
 
     window.seleziona = (titolo, artista) => {
+      const name = document.getElementById('userName').value.trim();
+      if(!name) {
+        alert('Inserisci il tuo nome in alto prima di scegliere un brano!');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
       const dedica = document.getElementById('dedica').value.trim();
-      set(ref(db, 'richiesta_live'), {
-        titolo: titolo,
-        artista: artista,
-        dedica: dedica,
+      
+      push(ref(db, 'richiesta_live'), {
+        name: name,
+        song: titolo + " - " + artista,
+        message: dedica,
         timestamp: Date.now()
+      }).then(() => {
+        alert('✨ Richiesta inviata sul palco!');
+        document.getElementById('dedica').value = '';
+      }).catch(err => {
+        alert('Errore invio: ' + err.message);
       });
-      alert('Richiesta inviata sul palco!');
-      document.getElementById('dedica').value = '';
     };
 
     window.proponiBrano = () => {
@@ -179,12 +208,11 @@
       const a = document.getElementById('new-song-artist').value.trim();
       if(!t || !a) return alert('Inserisci sia titolo che artista!');
       const newRef = push(ref(db, 'proposte'));
-      set(newRef, { titolo: t, artista: a, voti: 1 });
+      push(ref(db, 'proposte'), { titolo: t, artista: a, voti: 1 });
       document.getElementById('new-song-title').value = '';
       document.getElementById('new-song-artist').value = '';
     };
 
-    // Ascolta proposte
     onValue(ref(db, 'proposte'), (snapshot) => {
       const data = snapshot.val();
       const cont = document.getElementById('proposte-list');
@@ -192,16 +220,18 @@
       if(data) {
         Object.keys(data).forEach(id => {
           const item = data[id];
-          const div = document.createElement('div');
-          div.className = 'suggest-item';
-          div.innerHTML = `
-            <div>
-              <strong>${item.titolo}</strong> - ${item.artista}<br>
-              <span class="badge">${item.voti} / 10 Voti</span>
-            </div>
-            <button onclick="vota('${id}', ${item.voti})">+1 Voto</button>
-          `;
-          cont.appendChild(div);
+          if(item && item.titolo) {
+            const div = document.createElement('div');
+            div.className = 'suggest-item';
+            div.innerHTML = `
+              <div>
+                <strong>${item.titolo}</strong> - ${item.artista}<br>
+                <span class="badge">${item.voti || 1} / 10 Voti</span>
+              </div>
+              <button onclick="vota('${id}', ${item.voti || 1})">+1 Voto</button>
+            `;
+            cont.appendChild(div);
+          }
         });
       }
     });
