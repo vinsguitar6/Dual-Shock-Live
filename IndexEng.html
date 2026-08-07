@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pick a Live Song - Dual Shock</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { --bg: #121212; --card: #1e1e1e; --primary: #ff9800; --text: #ffffff; --subtext: #aaa; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
+    h1, h2 { text-align: center; color: var(--primary); margin-bottom: 5px; }
+    p.sub { text-align: center; color: var(--subtext); font-size: 0.9em; margin-bottom: 20px; }
+    .section { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    .song-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #333; }
+    .song-item:last-child { border-bottom: none; }
+    .song-info { display: flex; flex-direction: column; }
+    .song-title { font-weight: bold; font-size: 1em; }
+    .song-artist { font-size: 0.85em; color: var(--subtext); }
+    input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; box-sizing: border-box; }
+    button { background: var(--primary); color: #000; font-weight: bold; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+    button:active { opacity: 0.8; }
+    .suggest-item { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding: 8px; background: #2a2a2a; border-radius: 6px; }
+    .badge { background: #333; padding: 4px 8px; border-radius: 4px; font-size: 0.85em; color: var(--primary); }
+    
+    .social-section { margin-top: 25px; padding-top: 15px; border-top: 1px solid #333; text-align: center; }
+    .social-section p { color: var(--subtext); font-size: 0.9em; margin-bottom: 12px; font-weight: bold; }
+    .social-icons { display: flex; justify-content: center; gap: 15px; }
+    .social-btn { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; color: #fff; text-decoration: none; font-size: 1.4em; }
+    .instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+    .facebook { background: #1877f2; }
+  </style>
+</head>
+<body>
+
+  <h1>🎸 DUAL SHOCK LIVE</h1>
+  <p class="sub">Pick a song you'd like us to play tonight!</p>
+
+  <div class="section">
+    <label for="userName" style="font-weight: bold; color: var(--primary);">Your Name:</label>
+    <input type="text" id="userName" placeholder="e.g. Mark">
+    
+    <label for="dedica" style="font-weight: bold; margin-top: 10px; display: block;">Shoutout / Message (optional):</label>
+    <input type="text" id="dedica" placeholder="e.g. For Anna">
+  </div>
+
+  <div class="section">
+    <h2>Song List</h2>
+    <div id="song-list"></div>
+  </div>
+
+  <div class="section">
+    <h2>Suggest for Future Shows</h2>
+    <p class="sub">Suggest a song! Once it gets 10 votes, we'll learn it for our next gigs.</p>
+    <input type="text" id="new-song-title" placeholder="Song Title">
+    <input type="text" id="new-song-artist" placeholder="Artist">
+    <button onclick="proponiBrano()" style="width: 100%; margin-top: 5px;">Submit Song</button>
+    
+    <div id="proposte-list" style="margin-top: 15px;"></div>
+  </div>
+
+  <div class="social-section">
+    <p>Follow us on social media!</p>
+    <div class="social-icons">
+      <a href="https://www.instagram.com/dual_shock_duo?igsh=MTRjdmVvMTl1MzNhdw%3D%3D&utm_source=qr" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
+      <a href="https://www.facebook.com/share/18HKLuiHnc/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDqH7id1aRXulq9CfVjLn9TDu4QYX9Paao",
+      authDomain: "dual-shock-live.firebaseapp.com",
+      databaseURL: "https://dual-shock-live-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "dual-shock-live",
+      storageBucket: "dual-shock-live.firebasestorage.app",
+      messagingSenderId: "231528691879",
+      appId: "1:231528691879:web:1e0fdcea4a8f17815e0382"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const brani = [
+      { t: "A Mano a Mano", a: "Rino Gaetano" },
+      { t: "Ain’t no Sunshine", a: "Bill Withers" },
+      { t: "Back to Black", a: "Amy Winehouse" },
+      { t: "Bad Moon Rising", a: "Creedence Clearwater Revival" },
+      { t: "Basket Case", a: "Green Day" },
+      { t: "Behind Blue Eyes", a: "The Who" },
+      { t: "Black or White", a: "Michael Jackson" },
+      { t: "Blue Suede Shoes", a: "Elvis Presley" },
+      { t: "Bohemian Rhapsody", a: "Queen" },
+      { t: "Can’t Help Falling in Love", a: "Elvis Presley" },
+      { t: "Come and Get Your Love", a: "Redbone" },
+      { t: "Come As You Are", a: "Nirvana" },
+      { t: "Come Together", a: "The Beatles" },
+      { t: "Comfortably Numb", a: "Pink Floyd" },
+      { t: "Con le Mani", a: "Zucchero" },
+      { t: "Crawling", a: "Linkin Park" },
+      { t: "Crazy Little Thing Called Love", a: "Queen" },
+      { t: "Creep", a: "Radiohead" },
+      { t: "Diavolo in Me", a: "Zucchero" },
+      { t: "Don’t Look back in Anger", a: "Oasis" },
+      { t: "Don’t Stop me Now", a: "Queen" },
+      { t: "E la luna Bussò", a: "Loredana Bertè" },
+      { t: "Eleanor Rigby", a: "The Beatles" },
+      { t: "Enjoy the Silence", a: "Depeche Mode" },
+      { t: "Eppure Sentire", a: "Elisa" },
+      { t: "Every Breath you Take", a: "The Police" },
+      { t: "Everybody Hurts", a: "REM" },
+      { t: "Everybody Needs Somebody To Love", a: "The Blues Brothers" },
+      { t: "Feeling Good", a: "Nina Simone" },
+      { t: "Fly Away", a: "Lenny Kravitz" },
+      { t: "Forever Young", a: "Alphaville" },
+      { t: "Fortunate Son", a: "Creedence Clearwater Revival" },
+      { t: "Good Riddance (Time of Your Life)", a: "Green Day" },
+      { t: "Have You Ever Seen The Rain", a: "Creedence Clearwater Revival" },
+      { t: "Hey Jude", a: "The Beatles" },
+      { t: "Hold the Line", a: "Toto" },
+      { t: "Holiday", a: "Green Day" },
+      { t: "Hotel California", a: "Eagles" },
+      { t: "Hound Dog", a: "Elvis Presley" },
+      { t: "Hysteria", a: "Muse" },
+      { t: "I Can’t Get No Satisfaction", a: "Rolling Stones" },
+      { t: "I Don’t Want to Miss a Thing", a: "Aerosmith" },
+      { t: "I Feel Good", a: "James Brown" },
+      { t: "I Want to Break Free", a: "Queen" },
+      { t: "Il Cielo d'Irlanda", a: "Fiorella Mannoia" },
+      { t: "Il Tempo di Morire", a: "Lucio Battisti" },
+      { t: "Imagine", a: "John Lennon" },
+      { t: "Isn’t She Lovely", a: "Stevie Wonder" },
+      { t: "Jumping Jack Flash", a: "Rolling Stones" },
+      { t: "Karma Police", a: "Radiohead" },
+      { t: "Knocking on Heaven Door", a: "Bob Dylan" },
+      { t: "Let it Be", a: "The Beatles" },
+      { t: "Little Wing", a: "Jimi Hendrix" },
+      { t: "Mad World", a: "Gary Jules" },
+      { t: "Magnolia", a: "Negrita" },
+      { t: "Mama Mae", a: "Negrita" },
+      { t: "No Woman No Cry", a: "Bob Marley" },
+      { t: "Over The Rainbow", a: "Israel Kamakawiwo'ole" },
+      { t: "Personal Jesus", a: "Depeche Mode" },
+      { t: "Purple Rain", a: "Prince" },
+      { t: "Radioactive", a: "Imagine Dragons" },
+      { t: "Rehab", a: "Amy Winehouse" },
+      { t: "Roadhouse Blues", a: "The Doors" },
+      { t: "Rock Around The Clock", a: "Bill Haley" },
+      { t: "Sally", a: "Vasco Rossi" },
+      { t: "Shine On You Crazy Diamond", a: "Pink Floyd" },
+      { t: "Stand By Me", a: "Ben E. King" },
+      { t: "Streets of Love", a: "Rolling Stones" },
+      { t: "Sunday Morning", a: "Maroon 5" },
+      { t: "Sweet Home Alabama", a: "Lynyrd Skynyrd" },
+      { t: "Sweet Home Chicago", a: "The Blues Brothers" },
+      { t: "Take Me Home, Country Roads", a: "John Denver" },
+      { t: "Talkin' About Revolution", a: "Tracy Chapman" },
+      { t: "The Passenger", a: "Iggy Pop" },
+      { t: "Thunderstruck", a: "AC/DC" },
+      { t: "Vita Spericolata", a: "Vasco Rossi" },
+      { t: "What's Up", a: "4 Non Blondes" },
+      { t: "While My Guitar Gently Weeps", a: "The Beatles" },
+      { t: "Whole Lotta Love", a: "Led Zeppelin" },
+      { t: "Why Don’t You Do Right", a: "Peggy Lee" },
+      { t: "Wonderwall", a: "Oasis" },
+      { t: "You Never Can Tell", a: "Chuck Berry" }
+    ];
+
+    const listContainer = document.getElementById('song-list');
+    brani.forEach((b) => {
+      const item = document.createElement('div');
+      item.className = 'song-item';
+      item.innerHTML = `
+        <div class="song-info">
+          <span class="song-title">${b.t}</span>
+          <span class="song-artist">${b.a}</span>
+        </div>
+        <button onclick="seleziona('${b.t.replace(/'/g, "\\'")}', '${b.a.replace(/'/g, "\\'")}')">Pick</button>
+      `;
+      listContainer.appendChild(item);
+    });
+
+    window.seleziona = (titolo, artista) => {
+      const name = document.getElementById('userName').value.trim();
+      if(!name) {
+        alert('Please enter your name at the top before picking a song!');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      const dedica = document.getElementById('dedica').value.trim();
+      
+      push(ref(db, 'richiesta_live'), {
+        name: name,
+        song: titolo + " - " + artista,
+        message: dedica,
+        timestamp: Date.now()
+      }).then(() => {
+        alert('✨ Request sent to the stage!');
+        document.getElementById('dedica').value = '';
+      }).catch(err => {
+        alert('Error sending request: ' + err.message);
+      });
+    };
+
+    window.proponiBrano = () => {
+      const t = document.getElementById('new-song-title').value.trim();
+      const a = document.getElementById('new-song-artist').value.trim();
+      if(!t || !a) return alert('Please enter both title and artist!');
+      push(ref(db, 'proposte'), { titolo: t, artista: a, voti: 1 });
+      document.getElementById('new-song-title').value = '';
+      document.getElementById('new-song-artist').value = '';
+    };
+
+    onValue(ref(db, 'proposte'), (snapshot) => {
+      const data = snapshot.val();
+      const cont = document.getElementById('proposte-list');
+      cont.innerHTML = '';
+      if(data) {
+        Object.keys(data).forEach(id => {
+          const item = data[id];
+          if(item && item.titolo) {
+            const div = document.createElement('div');
+            div.className = 'suggest-item';
+            div.innerHTML = `
+              <div>
+                <strong>${item.titolo}</strong> - ${item.artista}<br>
+                <span class="badge">${item.voti || 1} / 10 Votes</span>
+              </div>
+              <button onclick="vota('${id}', ${item.voti || 1})">+1 Vote</button>
+            `;
+            cont.appendChild(div);
+          }
+        });
+      }
+    });
+
+    window.vota = (id, votiAttuali) => {
+      update(ref(db, `proposte/${id}`), { voti: votiAttuali + 1 });
+    };
+  </script>
+</body>
+</html>
