@@ -12,6 +12,11 @@
     p.sub { text-align: center; color: var(--subtext); font-size: 0.9em; margin-bottom: 20px; }
     .lang-switch { text-align: center; margin-bottom: 15px; }
     .lang-switch a { color: var(--primary); font-weight: bold; text-decoration: underline; font-size: 0.9em; }
+    
+    /* Top Timer Banner Box */
+    .timer-banner { display: none; background: #2b1d00; border: 1px solid var(--primary); color: #ffca28; padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; margin-bottom: 20px; font-size: 0.95em; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .timer-banner span { display: block; font-size: 1.2em; color: #fff; margin-top: 4px; }
+
     .section { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
     .song-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #333; }
     .song-item:last-child { border-bottom: none; }
@@ -21,6 +26,7 @@
     input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; box-sizing: border-box; }
     button { background: var(--primary); color: #000; font-weight: bold; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
     button:active { opacity: 0.8; }
+    button:disabled { background: #555; color: #888; cursor: not-allowed; opacity: 0.6; }
     
     .social-section { margin-top: 25px; padding-top: 15px; border-top: 1px solid #333; text-align: center; }
     .social-section p { color: var(--subtext); font-size: 0.9em; margin-bottom: 12px; font-weight: bold; }
@@ -34,9 +40,15 @@
 
   <h1>🎸 DUAL SHOCK LIVE</h1>
   <p class="sub">Pick a song you'd like us to play tonight!</p>
-  
+
   <div class="lang-switch">
     <a href="index.html">🇮🇹 Passa all'Italiano</a>
+  </div>
+
+  <!-- TOP TIMER BANNER -->
+  <div id="timerBanner" class="timer-banner">
+    ⏳ Next song request available in:
+    <span id="countdown">10:00</span>
   </div>
 
   <div class="section">
@@ -78,7 +90,7 @@
     const db = getDatabase(app);
 
     const brani = [
-     { t: "A Mano a Mano", a: "Rino Gaetano" },
+      { t: "A Mano a Mano", a: "Rino Gaetano" },
       { t: "Ain’t no Sunshine", a: "Bill Withers" },
       { t: "Back to Black", a: "Amy Winehouse" },
       { t: "Bad Moon Rising", a: "Creedence Clearwater Revival" },
@@ -166,7 +178,13 @@
       { t: "You Never Can Tell", a: "Chuck Berry" }
     ];
 
+    const COOLDOWN_MS = 10 * 60 * 1000; // 10 Minutes
     const listContainer = document.getElementById('song-list');
+    const timerBanner = document.getElementById('timerBanner');
+    const countdownEl = document.getElementById('countdown');
+    let timerInterval = null;
+
+    // Dynamic song list generation
     brani.forEach((b) => {
       const item = document.createElement('div');
       item.className = 'song-item';
@@ -175,10 +193,46 @@
           <span class="song-title">${b.t}</span>
           <span class="song-artist">${b.a}</span>
         </div>
-        <button onclick="seleziona('${b.t.replace(/'/g, "\\'")}', '${b.a.replace(/'/g, "\\'")}')">Pick</button>
+        <button class="select-btn" onclick="seleziona('${b.t.replace(/'/g, "\\'")}', '${b.a.replace(/'/g, "\\'")}')">Pick</button>
       `;
       listContainer.appendChild(item);
     });
+
+    // Timer & Countdown handler
+    function updateTimer() {
+      const lastRequest = localStorage.getItem('last_song_request_time');
+      if (!lastRequest) {
+        timerBanner.style.display = 'none';
+        setButtonsDisabled(false);
+        return;
+      }
+
+      const now = Date.now();
+      const diff = now - parseInt(lastRequest, 10);
+
+      if (diff < COOLDOWN_MS) {
+        const remaining = COOLDOWN_MS - diff;
+        const min = Math.floor(remaining / 60000);
+        const sec = Math.floor((remaining % 60000) / 1000);
+
+        countdownEl.innerText = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        timerBanner.style.display = 'block';
+        setButtonsDisabled(true);
+      } else {
+        timerBanner.style.display = 'none';
+        setButtonsDisabled(false);
+        clearInterval(timerInterval);
+      }
+    }
+
+    function setButtonsDisabled(disabled) {
+      const buttons = document.querySelectorAll('.select-btn');
+      buttons.forEach(btn => btn.disabled = disabled);
+    }
+
+    // Check timer on page load
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 1000);
 
     window.seleziona = (titolo, artista) => {
       const name = document.getElementById('userName').value.trim();
@@ -187,16 +241,28 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
+
+      // Safety check before sending
+      const lastRequest = localStorage.getItem('last_song_request_time');
+      if (lastRequest && (Date.now() - parseInt(lastRequest, 10) < COOLDOWN_MS)) {
+        alert('⏳ You have already sent a request! Please wait for the timer at the top to expire.');
+        return;
+      }
+
       const dedica = document.getElementById('dedica').value.trim();
+      const now = Date.now();
       
       push(ref(db, 'richiesta_live'), {
         name: name,
         song: titolo + " - " + artista,
         message: dedica,
-        timestamp: Date.now()
+        timestamp: now
       }).then(() => {
         alert('✨ Request sent to the stage!');
         document.getElementById('dedica').value = '';
+        localStorage.setItem('last_song_request_time', now.toString());
+        updateTimer();
+        timerInterval = setInterval(updateTimer, 1000);
       }).catch(err => {
         alert('Error sending request: ' + err.message);
       });
