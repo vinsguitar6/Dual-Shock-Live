@@ -3,40 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Palco Band - Dashboard Live</title>
+  <title>Dashboard Palco - Dual Shock</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #000; color: #fff; padding: 20px; text-align: center; margin: 0; }
-    h1 { color: #ff9800; font-size: 1.8em; margin-bottom: 20px; letter-spacing: 1px; }
-    
-    #requests-container { display: flex; flex-direction: column-reverse; gap: 15px; max-width: 700px; margin: 0 auto 30px auto; }
-    .card { background: #1a1a1a; border-left: 6px solid #ff9800; border-radius: 10px; padding: 20px; text-align: left; position: relative; box-shadow: 0 4px 12px rgba(0,0,0,0.6); }
-    .card-header { display: flex; justify-content: space-between; color: #888; font-size: 0.9em; margin-bottom: 8px; padding-right: 110px; }
-    .user-name { color: #ff9800; font-weight: bold; font-size: 1.1em; }
-    .song-title { font-size: 1.4em; font-weight: bold; color: #fff; margin: 8px 0; }
-    .user-message { font-size: 1.05em; color: #00e676; font-style: italic; background: #222; padding: 10px; border-radius: 6px; margin-top: 10px; }
-    
-    .done-btn { position: absolute; top: 15px; right: 15px; background: #e53935; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-    .done-btn:active { opacity: 0.8; }
-
-    .empty-msg { color: #666; font-size: 1.2em; font-style: italic; padding: 20px; background: #111; border-radius: 10px; }
-    .error-msg { color: #ff5252; font-size: 1.1em; padding: 15px; background: #2c0b0b; border: 1px solid #ff5252; border-radius: 8px; }
-
-    .suggeriti { margin: 30px auto 0 auto; max-width: 700px; text-align: left; background: #111; padding: 20px; border-radius: 10px; border: 1px solid #333; }
-    .suggeriti h2 { color: #ff9800; font-size: 1.2em; margin-top: 0; }
-    .top-song { color: #fff; font-weight: bold; font-size: 1.1em; margin-bottom: 8px; background: #222; padding: 8px 12px; border-radius: 6px; }
+    :root { --bg: #121212; --card: #1e1e1e; --primary: #ff9800; --text: #ffffff; --subtext: #aaa; --danger: #f44336; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
+    h1 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+    .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; }
+    .req-info { display: flex; flex-direction: column; gap: 4px; }
+    .req-song { font-size: 1.1em; font-weight: bold; color: var(--primary); }
+    .req-user { font-weight: bold; font-size: 0.95em; }
+    .req-msg { font-style: italic; color: #4caf50; font-size: 0.9em; }
+    .btn-done { background: #333; color: #fff; border: 1px solid #555; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+    .btn-clear-all { background: var(--danger); color: #fff; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 20px; }
+    .empty-msg { text-align: center; color: var(--subtext); margin-top: 40px; font-size: 1.1em; }
   </style>
 </head>
 <body>
 
-  <h1>🎸 RICHIESTE DAL VIVO - DUAL SHOCK</h1>
+  <h1>📡 Richieste Live in Tempo Reale</h1>
+  
+  <button class="btn-clear-all" onclick="svuotaTutto()">🗑️ Azzera tutte le richieste (Fine Serata)</button>
 
   <div id="requests-container">
-    <div class="empty-msg">In attesa di richieste dal pubblico...</div>
-  </div>
-
-  <div class="suggeriti">
-    <h2>Brani Proposti pronti per la Scaletta (≥ 5 Voti)</h2>
-    <div id="goals-list" style="color: #888;">Nessun brano ha ancora raggiunto 5 voti.</div>
+    <p class="empty-msg">Nessuna richiesta al momento...</p>
   </div>
 
   <script type="module">
@@ -56,80 +45,42 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Ascolta le richieste dal vivo in tempo reale
-    onValue(ref(db, 'richiesta_live'), (snapshot) => {
-      const container = document.getElementById('requests-container');
-      container.innerHTML = '';
-      const data = snapshot.val();
+    const container = document.getElementById('requests-container');
 
-      if (!data) {
-        container.innerHTML = '<div class="empty-msg">In attesa di richieste dal pubblico...</div>';
+    onValue(ref(db, 'richiesta_live'), (snapshot) => {
+      const data = snapshot.val();
+      container.innerHTML = '';
+
+      if(!data) {
+        container.innerHTML = '<p class="empty-msg">Nessuna richiesta al momento...</p>';
         return;
       }
 
-      let count = 0;
-      Object.keys(data).forEach((key) => {
+      Object.keys(data).forEach(key => {
         const item = data[key];
-        if (!item) return;
-
-        count++;
-        const time = item.timestamp ? new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
-          <div class="card-header">
-            <span class="user-name">👤 ${item.name || 'Anonimo'}</span>
-            <span>🕒 ${time}</span>
+          <div class="req-info">
+            <span class="req-song">🎵 ${item.song}</span>
+            <span class="req-user">👤 Da: ${item.name}</span>
+            ${item.message ? `<span class="req-msg">💬 "${item.message}"</span>` : ''}
           </div>
-          <div class="song-title">🎵 ${item.song || 'Brano non specificato'}</div>
-          ${item.message ? `<div class="user-message">💬 "${item.message}"</div>` : ''}
-          <button class="done-btn">SUONATA ✓</button>
+          <button class="btn-done" onclick="rimuovi('${key}')">✓ Fatta</button>
         `;
-
-        // Assegna l'evento al pulsante in modo sicuro senza problemi di stringa/escaping
-        const btn = card.querySelector('.done-btn');
-        btn.onclick = () => window.rimuoviRichiesta(key);
-
         container.appendChild(card);
       });
-
-      if (count === 0) {
-        container.innerHTML = '<div class="empty-msg">In attesa di richieste dal pubblico...</div>';
-      }
-    }, (error) => {
-      console.error("Errore Firebase:", error);
-      document.getElementById('requests-container').innerHTML = 
-        `<div class="error-msg">⚠️ Errore di connessione a Firebase: ${error.message}</div>`;
     });
 
-    // Funzione globale per rimuovere la richiesta una volta eseguita
-    window.rimuoviRichiesta = (key) => {
-      remove(ref(db, 'richiesta_live/' + key)).catch((err) => {
-        alert("Errore durante l'eliminazione: " + err.message);
-      });
+    window.rimuovi = (key) => {
+      remove(ref(db, 'richiesta_live/' + key));
     };
 
-    // Ascolta i brani proposti che raggiungono i 5 voti
-    onValue(ref(db, 'proposte'), (snapshot) => {
-      const data = snapshot.val();
-      const list = document.getElementById('goals-list');
-      list.innerHTML = '';
-      let pronti = false;
-
-      if (data) {
-        Object.keys(data).forEach(id => {
-          const item = data[id];
-          if (item && item.voti >= 5) {
-            pronti = true;
-            list.innerHTML += `<div class="top-song">🔥 ${item.titolo} - ${item.artista} (${item.voti} Voti)</div>`;
-          }
-        });
+    window.svuotaTutto = () => {
+      if(confirm('Vuoi davvero cancellare tutte le richieste arrivate stasera?')) {
+        remove(ref(db, 'richiesta_live'));
       }
-      if (!pronti) list.innerHTML = 'Nessun brano ha ancora raggiunto 5 voti.';
-    }, (error) => {
-      console.error("Errore Proposte:", error);
-    });
+    };
   </script>
 </body>
 </html>
