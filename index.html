@@ -21,7 +21,6 @@
     input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; box-sizing: border-box; }
     button { background: var(--primary); color: #000; font-weight: bold; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
     button:active { opacity: 0.8; }
-    .suggest-item { margin-top: 10px; padding: 10px; background: #2a2a2a; border-radius: 6px; }
     
     .social-section { margin-top: 25px; padding-top: 15px; border-top: 1px solid #333; text-align: center; }
     .social-section p { color: var(--subtext); font-size: 0.9em; margin-bottom: 12px; font-weight: bold; }
@@ -53,16 +52,6 @@
     <div id="song-list"></div>
   </div>
 
-  <div class="section">
-    <h2>Proponi per i prossimi Live</h2>
-    <p class="sub">Proponi un brano! Lo terremo in considerazione per i prossimi show.</p>
-    <input type="text" id="new-song-title" placeholder="Titolo Brano">
-    <input type="text" id="new-song-artist" placeholder="Artista">
-    <button onclick="proponiBrano()" style="width: 100%; margin-top: 5px;">Invia Proposta</button>
-    
-    <div id="proposte-list" style="margin-top: 15px;"></div>
-  </div>
-
   <div class="social-section">
     <p>Seguiteci sui nostri canali social!</p>
     <div class="social-icons">
@@ -73,7 +62,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDqH7id1aRXulq9CfVjLn9TDu4QYX9Paao",
@@ -208,43 +197,6 @@
         alert('Errore invio: ' + err.message);
       });
     };
-
-    window.proponiBrano = () => {
-      const t = document.getElementById('new-song-title').value.trim();
-      const a = document.getElementById('new-song-artist').value.trim();
-      if(!t || !a) return alert('Inserisci sia titolo che artista!');
-
-      push(ref(db, 'proposte'), { 
-        titolo: t, 
-        artista: a,
-        timestamp: Date.now()
-      }).then(() => {
-        alert('💡 Proposta inviata con successo!');
-        document.getElementById('new-song-title').value = '';
-        document.getElementById('new-song-artist').value = '';
-      }).catch(err => {
-        alert('Errore invio proposta: ' + err.message);
-      });
-    };
-
-    onValue(ref(db, 'proposte'), (snapshot) => {
-      const data = snapshot.val();
-      const cont = document.getElementById('proposte-list');
-      cont.innerHTML = '';
-      if(data) {
-        Object.keys(data).forEach(id => {
-          const item = data[id];
-          if(item && item.titolo) {
-            const div = document.createElement('div');
-            div.className = 'suggest-item';
-            div.innerHTML = `
-              <strong>🎵 ${item.titolo}</strong> - ${item.artista}
-            `;
-            cont.appendChild(div);
-          }
-        });
-      }
-    });
   </script>
 </body>
 </html>
