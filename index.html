@@ -6,209 +6,35 @@
   <title>Scegli il brano dal vivo - Dual Shock</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root {
-      /* Palette Colori Personalizzata */
-      --bg-dark: #0b0f19;
-      --card-bg: rgba(22, 30, 49, 0.75);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --accent-cyan: #00f2fe;
-      --accent-purple: #4facfe;
-      --accent-gold: #ffb703;
-      --gradient-accent: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-      --text-main: #f1f5f9;
-      --text-sub: #94a3b8;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      margin: 0;
-      padding: 15px;
-    }
-
-    h1 {
-      text-align: center;
-      background: var(--gradient-accent);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 5px;
-    }
-
-    h2 {
-      text-align: center;
-      color: var(--text-main);
-      margin-bottom: 15px;
-    }
-
-    p.sub {
-      text-align: center;
-      color: var(--text-sub);
-      font-size: 0.9em;
-      margin-bottom: 20px;
-    }
-
-    .lang-switch {
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    .lang-switch a {
-      color: var(--accent-cyan);
-      font-weight: bold;
-      text-decoration: none;
-      font-size: 0.9em;
-      border-bottom: 1px dashed var(--accent-cyan);
-    }
-
+    :root { --bg: #121212; --card: #1e1e1e; --primary: #00bcd4; --text: #ffffff; --subtext: #aaa; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
+    h1, h2 { text-align: center; color: var(--primary); margin-bottom: 5px; }
+    p.sub { text-align: center; color: var(--subtext); font-size: 0.9em; margin-bottom: 20px; }
+    .lang-switch { text-align: center; margin-bottom: 15px; }
+    .lang-switch a { color: var(--primary); font-weight: bold; text-decoration: underline; font-size: 0.9em; }
+    
     /* Box Banner Timer in Alto */
-    .timer-banner {
-      display: none;
-      background: rgba(255, 183, 3, 0.1);
-      border: 1px solid var(--accent-gold);
-      color: var(--accent-gold);
-      padding: 12px;
-      border-radius: 10px;
-      text-align: center;
-      font-weight: bold;
-      margin-bottom: 20px;
-      font-size: 0.95em;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-      backdrop-filter: blur(8px);
-    }
+    .timer-banner { display: none; background: #002b3d; border: 1px solid var(--primary); color: #80deea; padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; margin-bottom: 20px; font-size: 0.95em; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .timer-banner span { display: block; font-size: 1.2em; color: #fff; margin-top: 4px; }
 
-    .timer-banner span {
-      display: block;
-      font-size: 1.2em;
-      color: #fff;
-      margin-top: 4px;
-    }
-
-    .section {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      backdrop-filter: blur(12px);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 25px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-    }
-
-    .song-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--card-border);
-    }
-
-    .song-item:last-child {
-      border-bottom: none;
-    }
-
-    .song-info {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .song-title {
-      font-weight: bold;
-      font-size: 1em;
-      color: var(--text-main);
-    }
-
-    .song-artist {
-      font-size: 0.85em;
-      color: var(--text-sub);
-    }
-
-    label {
-      color: var(--accent-cyan);
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 6px;
-      border: 1px solid var(--card-border);
-      background: rgba(11, 15, 25, 0.6);
-      color: var(--text-main);
-      box-sizing: border-box;
-    }
-
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--accent-cyan);
-    }
-
-    button {
-      background: var(--accent-gold);
-      color: #0b0f19;
-      font-weight: bold;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: transform 0.1s ease, opacity 0.2s ease;
-    }
-
-    button:active {
-      transform: scale(0.96);
-    }
-
-    button:disabled {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-sub);
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-
+    .section { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    .song-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #333; }
+    .song-item:last-child { border-bottom: none; }
+    .song-info { display: flex; flex-direction: column; }
+    .song-title { font-weight: bold; font-size: 1em; }
+    .song-artist { font-size: 0.85em; color: var(--subtext); }
+    input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; box-sizing: border-box; }
+    button { background: var(--primary); color: #000; font-weight: bold; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+    button:active { opacity: 0.8; }
+    button:disabled { background: #555; color: #888; cursor: not-allowed; opacity: 0.6; }
+    
     /* Sezione Social in alto */
-    .social-section {
-      margin-bottom: 25px;
-      padding: 15px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      backdrop-filter: blur(12px);
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-    }
-
-    .social-section p {
-      color: var(--text-sub);
-      font-size: 0.9em;
-      margin-bottom: 12px;
-      font-weight: bold;
-    }
-
-    .social-icons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-
-    .social-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      color: #fff;
-      text-decoration: none;
-      font-size: 1.4em;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-
-    .instagram {
-      background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-    }
-
-    .facebook {
-      background: #1877f2;
-    }
+    .social-section { margin-bottom: 25px; padding: 15px; background: var(--card); border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    .social-section p { color: var(--subtext); font-size: 0.9em; margin-bottom: 12px; font-weight: bold; }
+    .social-icons { display: flex; justify-content: center; gap: 15px; }
+    .social-btn { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; color: #fff; text-decoration: none; font-size: 1.4em; }
+    .instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+    .facebook { background: #1877f2; }
   </style>
 </head>
 <body>
@@ -227,7 +53,7 @@
   </div>
 
   <div class="section">
-    <label for="userName" style="font-weight: bold;">Il tuo Nome:</label>
+    <label for="userName" style="font-weight: bold; color: var(--primary);">Il tuo Nome:</label>
     <input type="text" id="userName" placeholder="Es. Marco">
     
     <label for="dedica" style="font-weight: bold; margin-top: 10px; display: block;">Dedica o messaggio (opzionale):</label>
