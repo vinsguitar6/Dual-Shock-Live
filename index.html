@@ -360,7 +360,7 @@
 </div>
 
 <script>
-  // CONFIGURAZIONE FIREBASE - Incolla qui le tue credenziali
+  // CONFIGURAZIONE FIREBASE - Sostituisci con le tue chiavi se necessario
   const firebaseConfig = {
     apiKey: "TUO_API_KEY",
     authDomain: "TUO_PROJECT_ID.firebaseapp.com",
@@ -384,7 +384,6 @@
     { title: "Ligabue Medley", artist: "Ligabue" },
     { title: "Creep", artist: "Radiohead" },
     { title: "L'Avvelenata", artist: "Francesco Guccini" }
-    // Aggiungi qui gli altri brani del tuo repertorio
   ];
 
   // BADGE GAMIFICATION
@@ -466,12 +465,25 @@
     document.getElementById('levelModal').classList.remove('active');
   }
 
-  // FIREBASE LISTENERS
+  // FIREBASE LISTENERS - CORRETTO E ROBUSTO
   function listenState() {
     db.ref('stato_concerto').on('value', (snap) => {
-      const isOnline = snap.val() === true;
-      document.getElementById('onlineSection').style.display = isOnline ? 'block' : 'none';
-      document.getElementById('offlineSection').style.display = isOnline ? 'none' : 'block';
+      const val = snap.val();
+      console.log("Stato ricevuto da Firebase:", val);
+
+      // Riconosce booleano true, oppure stringhe come "online", "true", "ON"
+      const isOnline = (val === true) || 
+                       (typeof val === 'string' && ['online', 'true', 'on'].includes(val.trim().toLowerCase()));
+
+      const onlineEl = document.getElementById('onlineSection');
+      const offlineEl = document.getElementById('offlineSection');
+
+      if (onlineEl && offlineEl) {
+        onlineEl.style.display = isOnline ? 'block' : 'none';
+        offlineEl.style.display = isOnline ? 'none' : 'block';
+      }
+    }, (error) => {
+      console.error("Errore di lettura dallo stato Firebase:", error);
     });
   }
 
@@ -505,6 +517,8 @@
           container.appendChild(div);
         });
       }
+    }, (error) => {
+      console.error("Errore di lettura prossime date:", error);
     });
   }
 
@@ -552,6 +566,8 @@
       alert(`Richiesta inviata con successo! 🎸`);
       document.getElementById('dedicaText').value = '';
       incrementInteraction();
+    }).catch(err => {
+      alert("Errore nell'invio della richiesta: " + err.message);
     });
   }
 
@@ -566,6 +582,8 @@
     }).then(() => {
       alert("Grazie per il suggerimento! Lo terremo in considerazione per le prossime scalette 🎶");
       document.getElementById('offSongTitle').value = '';
+    }).catch(err => {
+      alert("Errore nell'invio del suggerimento: " + err.message);
     });
   }
 </script>
