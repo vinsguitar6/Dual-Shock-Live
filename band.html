@@ -3,34 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Palco - Dual Shock</title>
+  <title>Dual Shock - Dashboard Palco</title>
   <style>
-    :root { --bg: #121212; --card: #1e1e1e; --primary: #ff9800; --text: #ffffff; --subtext: #aaa; --danger: #f44336; }
+    :root { --bg: #121212; --card: #1e1e1e; --primary: #ff9800; --text: #ffffff; --subtext: #aaa; --green: #4caf50; --red: #f44336; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
-    h1 { text-align: center; color: var(--primary); margin-bottom: 20px; }
-    .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; }
-    .req-info { display: flex; flex-direction: column; gap: 4px; }
-    .req-song { font-size: 1.1em; font-weight: bold; color: var(--primary); }
-    .req-user { font-weight: bold; font-size: 0.95em; }
-    .req-msg { font-style: italic; color: #4caf50; font-size: 0.9em; }
-    .btn-done { background: #333; color: #fff; border: 1px solid #555; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
-    .btn-clear-all { background: var(--danger); color: #fff; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 20px; }
-    .empty-msg { text-align: center; color: var(--subtext); margin-top: 40px; font-size: 1.1em; }
+    h1, h2 { text-align: center; color: var(--primary); margin-bottom: 10px; }
+    
+    .status-box { padding: 12px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 20px; font-size: 1.1em; }
+    .status-active { background: #1b3e20; color: #81c784; border: 1px solid var(--green); }
+    .status-closed { background: #3e1212; color: #e57373; border: 1px solid var(--red); }
+
+    .controls { display: flex; gap: 10px; margin-bottom: 20px; }
+    .controls button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1em; cursor: pointer; color: #fff; }
+    .btn-start { background: var(--green); }
+    .btn-end { background: var(--red); }
+    
+    .section { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    
+    .req-item { padding: 12px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+    .req-item:last-child { border-bottom: none; }
+    .req-info { display: flex; flex-direction: column; }
+    .req-song { font-weight: bold; font-size: 1.1em; color: var(--primary); }
+    .req-user { font-size: 0.9em; color: var(--text); }
+    .req-msg { font-size: 0.85em; color: var(--subtext); font-style: italic; }
+
+    /* Accordion / Cartella Tendina */
+    details { background: #252525; border-radius: 8px; padding: 10px; border: 1px solid #333; margin-top: 10px; }
+    summary { font-weight: bold; font-size: 1.1em; color: var(--primary); cursor: pointer; padding: 5px; outline: none; }
+    
+    .btn-action { background: #333; color: #fff; border: 1px solid #555; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8em; }
+    .btn-archive { background: #2e7d32; color: #fff; border: none; }
   </style>
 </head>
 <body>
 
-  <h1>📡 Richieste Live in Tempo Reale</h1>
-  
-  <button class="btn-clear-all" onclick="svuotaTutto()">🗑️ Azzera tutte le richieste (Fine Serata)</button>
+  <h1>🎛️ DUAL SHOCK - CONTROL PALCO</h1>
 
-  <div id="requests-container">
-    <p class="empty-msg">Nessuna richiesta al momento...</p>
+  <!-- STATO CONCERTO -->
+  <div id="statusBox" class="status-box status-active">
+    LIVE ATTIVO - Ricezione richieste aperta
+  </div>
+
+  <div class="controls">
+    <button class="btn-start" onclick="setStatoConcerto(true)">▶️ Inizio Concerto</button>
+    <button class="btn-end" onclick="setStatoConcerto(false)">⏹️ Fine Concerto</button>
+  </div>
+
+  <!-- RICHIESTE IN TEMPO REALE SERATA -->
+  <div class="section">
+    <h2>🎵 Richieste Live Serata</h2>
+    <div id="richieste-list">In attesa di richieste...</div>
+  </div>
+
+  <!-- PROPOSTE PER I PROSSIMI LIVE (CARTELLA A TENDINA) -->
+  <div class="section">
+    <details>
+      <summary>📁 Proposte Brani per i Prossimi Live (<span id="countProposte">0</span>)</summary>
+      <div id="proposte-list" style="margin-top: 15px;">Apertura cartella in corso...</div>
+    </details>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDqH7id1aRXulq9CfVjLn9TDu4QYX9Paao",
@@ -45,41 +80,95 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const container = document.getElementById('requests-container');
+    // 1. Gestione Stato Concerto
+    window.setStatoConcerto = (attivo) => {
+      set(ref(db, 'stato_concerto/attivo'), attivo).then(() => {
+        alert(attivo ? '▶️ Concerto Avviato! Le richieste sono aperte.' : '⏹️ Concerto Terminato! Le richieste sono state bloccate.');
+      });
+    };
 
+    onValue(ref(db, 'stato_concerto/attivo'), (snapshot) => {
+      const attivo = snapshot.val() !== false;
+      const statusBox = document.getElementById('statusBox');
+      if (attivo) {
+        statusBox.innerText = '🟢 LIVE ATTIVO - Ricezione richieste APERTA';
+        statusBox.className = 'status-box status-active';
+      } else {
+        statusBox.innerText = '🔴 CONCERTO CHIUSO - Richieste BLOCCATE';
+        statusBox.className = 'status-box status-closed';
+      }
+    });
+
+    // 2. Ascolto Richieste Live Serata
     onValue(ref(db, 'richiesta_live'), (snapshot) => {
+      const list = document.getElementById('richieste-list');
+      list.innerHTML = '';
       const data = snapshot.val();
-      container.innerHTML = '';
 
-      if(!data) {
-        container.innerHTML = '<p class="empty-msg">Nessuna richiesta al momento...</p>';
+      if (!data) {
+        list.innerHTML = '<p style="color: var(--subtext); text-align: center;">Nessuna richiesta al momento.</p>';
         return;
       }
 
-      Object.keys(data).forEach(key => {
+      Object.keys(data).reverse().forEach(key => {
         const item = data[key];
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
+        const div = document.createElement('div');
+        div.className = 'req-item';
+        div.innerHTML = `
           <div class="req-info">
-            <span class="req-song">🎵 ${item.song}</span>
-            <span class="req-user">👤 Da: ${item.name}</span>
+            <span class="req-song">${item.song}</span>
+            <span class="req-user">👤 Richiesto da: ${item.name}</span>
             ${item.message ? `<span class="req-msg">💬 "${item.message}"</span>` : ''}
           </div>
-          <button class="btn-done" onclick="rimuovi('${key}')">✓ Fatta</button>
+          <button class="btn-action" onclick="eliminaRichiesta('${key}')">❌ Suonato</button>
         `;
-        container.appendChild(card);
+        list.appendChild(div);
       });
     });
 
-    window.rimuovi = (key) => {
+    window.eliminaRichiesta = (key) => {
       remove(ref(db, 'richiesta_live/' + key));
     };
 
-    window.svuotaTutto = () => {
-      if(confirm('Vuoi davvero cancellare tutte le richieste arrivate stasera?')) {
-        remove(ref(db, 'richiesta_live'));
+    // 3. Ascolto Proposte Prossimi Live
+    onValue(ref(db, 'proposte_brani'), (snapshot) => {
+      const list = document.getElementById('proposte-list');
+      const countEl = document.getElementById('countProposte');
+      list.innerHTML = '';
+      const data = snapshot.val();
+
+      if (!data) {
+        countEl.innerText = '0';
+        list.innerHTML = '<p style="color: var(--subtext);">Nessuna proposta inviata dal pubblico.</p>';
+        return;
       }
+
+      let count = 0;
+      Object.keys(data).reverse().forEach(key => {
+        const item = data[key];
+        if (item.stato !== 'archiviato') {
+          count++;
+          const div = document.createElement('div');
+          div.className = 'req-item';
+          div.innerHTML = `
+            <div class="req-info">
+              <span class="req-song">${item.song}</span>
+              <span class="req-user">🎤 Artista: ${item.artist}</span>
+            </div>
+            <button class="btn-action btn-archive" onclick="archiviaProposta('${key}')">✅ Segna come Studiato</button>
+          `;
+          list.appendChild(div);
+        }
+      });
+
+      countEl.innerText = count.toString();
+      if (count === 0) {
+        list.innerHTML = '<p style="color: var(--subtext);">Tutte le proposte sono state archiviate o non ce ne sono di nuove!</p>';
+      }
+    });
+
+    window.archiviaProposta = (key) => {
+      update(ref(db, 'proposte_brani/' + key), { stato: 'archiviato' });
     };
   </script>
 </body>
