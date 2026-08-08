@@ -23,14 +23,24 @@
     .history-card { background: #222; border-left: 4px solid #888; padding: 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; opacity: 0.8; }
     
     .btn-clear-all { background: #f44336; color: #fff; font-weight: bold; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 10px; font-size: 1em; }
-    .empty-msg { text-align: center; color: var(--subtext); font-style: italic; padding: 10px; }
     
+    /* Toggle Concert Button Styles */
+    .btn-concert-toggle { font-weight: bold; border: none; padding: 12px 16px; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 15px; font-size: 1.05em; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: background 0.2s; }
+    .btn-concert-active { background: #d32f2f; color: #fff; } /* Fine Concerto (rosso) */
+    .btn-concert-closed { background: #2e7d32; color: #fff; } /* Inizio Concerto (verde) */
+
+    .empty-msg { text-align: center; color: var(--subtext); font-style: italic; padding: 10px; }
     .counter-badge { background: var(--primary); color: #000; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 0.9em; }
   </style>
 </head>
 <body>
 
   <h1>📡 Richieste Live in Tempo Reale</h1>
+
+  <!-- SEZIONE CONTROLLO STATO CONCERTO -->
+  <div class="section">
+    <button id="concertToggleBtn" class="btn-concert-toggle btn-concert-active" onclick="toggleConcertState()">🔴 Fine Concerto</button>
+  </div>
 
   <!-- SEZIONE RICHIESTE ATTIVE -->
   <div class="section">
@@ -54,7 +64,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, remove, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, remove, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDqH7id1aRXulq9CfVjLn9TDu4QYX9Paao",
@@ -72,6 +82,35 @@
     const container = document.getElementById('requests-container');
     const historyContainer = document.getElementById('history-container');
     const totalCountEl = document.getElementById('total-count');
+    const concertToggleBtn = document.getElementById('concertToggleBtn');
+
+    let isConcertClosed = false;
+
+    // Ascolta lo stato del concerto per aggiornare il pulsante nella pagina band
+    onValue(ref(db, 'concerto_chiuso'), (snapshot) => {
+      isConcertClosed = snapshot.val() === true;
+      if (isConcertClosed) {
+        concertToggleBtn.innerText = "🟢 Inizio Concerto";
+        concertToggleBtn.className = "btn-concert-toggle btn-concert-closed";
+      } else {
+        concertToggleBtn.innerText = "🔴 Fine Concerto";
+        concertToggleBtn.className = "btn-concert-toggle btn-concert-active";
+      }
+    });
+
+    // Funzione per attivare/disattivare il concerto
+    window.toggleConcertState = () => {
+      const newState = !isConcertClosed;
+      set(ref(db, 'concerto_chiuso'), newState).then(() => {
+        if (newState) {
+          alert("Concerto terminato: le richieste sono state bloccate e l'avviso è comparso sugli schermi del pubblico.");
+        } else {
+          alert("Concerto riavviato: le richieste sono state riattivate!");
+        }
+      }).catch(err => {
+        alert("Errore nell'aggiornamento dello stato: " + err.message);
+      });
+    };
 
     // Ascolta le richieste attive
     onValue(ref(db, 'richiesta_live'), (snapshot) => {
@@ -130,14 +169,12 @@
 
     // Funzione quando si clicca "Fatta": sposta da richiesta_live a storico_live
     window.segnaFatta = (key, song, name, message) => {
-      // 1. Aggiunge allo storico
       push(ref(db, 'storico_live'), {
         song: song,
         name: name,
         message: message,
         completedAt: Date.now()
       }).then(() => {
-        // 2. Rimuove dalle richieste attive
         remove(ref(db, 'richiesta_live/' + key));
       }).catch(err => {
         alert('Errore nello spostamento: ' + err.message);
