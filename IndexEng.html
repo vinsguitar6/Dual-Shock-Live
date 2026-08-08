@@ -73,10 +73,24 @@
   </div>
 
   <div class="section">
-    <label for="userName" style="font-weight: bold; color: var(--primary);">Your Name:</label>
-    <input type="text" id="userName" placeholder="e.g. Mark">
+    <!-- USER NAME WITH LOCAL STORAGE & CHANGE BUTTON -->
+    <div id="nameInputContainer">
+      <label for="userName" style="font-weight: bold; color: var(--primary);">Your Name:</label>
+      <div style="display: flex; gap: 8px; align-items: center; margin-top: 5px;">
+        <input type="text" id="userName" placeholder="e.g. Mark" style="margin: 0; flex: 1;">
+        <button onclick="salvaNome()" style="padding: 10px 14px;">Save</button>
+      </div>
+    </div>
+
+    <div id="nameDisplayContainer" style="display: none; justify-content: space-between; align-items: center; padding: 5px 0;">
+      <div>
+        <span style="color: var(--subtext); font-size: 0.85em;">Your Name:</span><br>
+        <strong id="displayName" style="font-size: 1.1em; color: var(--primary);"></strong>
+      </div>
+      <button onclick="abilitaModificaNome()" style="background: #333; color: #fff; border: 1px solid #555; padding: 6px 12px; font-size: 0.85em;">Change</button>
+    </div>
     
-    <label for="dedica" style="font-weight: bold; margin-top: 10px; display: block;">Shoutout / Message (optional):</label>
+    <label for="dedica" style="font-weight: bold; margin-top: 15px; display: block;">Shoutout / Message (optional):</label>
     <input type="text" id="dedica" placeholder="e.g. For Anna">
   </div>
 
@@ -209,7 +223,38 @@
     const listContainer = document.getElementById('song-list');
     const timerBanner = document.getElementById('timerBanner');
     const countdownEl = document.getElementById('countdown');
+    const nameInputContainer = document.getElementById('nameInputContainer');
+    const nameDisplayContainer = document.getElementById('nameDisplayContainer');
+    const userNameInput = document.getElementById('userName');
+    const displayNameSpan = document.getElementById('displayName');
     let timerInterval = null;
+
+    // Handle saved name on startup
+    const savedName = localStorage.getItem('dual_shock_user_name');
+    if (savedName) {
+      userNameInput.value = savedName;
+      displayNameSpan.innerText = savedName;
+      nameInputContainer.style.display = 'none';
+      nameDisplayContainer.style.display = 'flex';
+    }
+
+    window.salvaNome = () => {
+      const name = userNameInput.value.trim();
+      if (!name) {
+        alert('Please enter a valid name!');
+        return;
+      }
+      localStorage.setItem('dual_shock_user_name', name);
+      displayNameSpan.innerText = name;
+      nameInputContainer.style.display = 'none';
+      nameDisplayContainer.style.display = 'flex';
+    };
+
+    window.abilitaModificaNome = () => {
+      nameInputContainer.style.display = 'block';
+      nameDisplayContainer.style.display = 'none';
+      userNameInput.focus();
+    };
 
     brani.forEach((b) => {
       const item = document.createElement('div');
@@ -259,12 +304,15 @@
     timerInterval = setInterval(updateTimer, 1000);
 
     window.seleziona = (titolo, artista) => {
-      const name = document.getElementById('userName').value.trim();
+      let name = localStorage.getItem('dual_shock_user_name') || userNameInput.value.trim();
       if(!name) {
         alert('Please enter your name at the top before picking a song!');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
+
+      // Automatically save if entered via input without explicitly clicking save
+      localStorage.setItem('dual_shock_user_name', name);
 
       const lastRequest = localStorage.getItem('last_song_request_time');
       if (lastRequest && (Date.now() - parseInt(lastRequest, 10) < COOLDOWN_MS)) {
