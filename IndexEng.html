@@ -6,7 +6,13 @@
   <title>Pick a Live Song - Dual Shock</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root { --bg: #121212; --card: #1e1e1e; --primary: #00bcd4; --text: #ffffff; --subtext: #aaa; }
+    :root { 
+      --bg: #0b132b; 
+      --card: #1c2541; 
+      --primary: #00bcd4; 
+      --text: #ffffff; 
+      --subtext: #8d99ae; 
+    }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; max-width: 600px; margin: auto; }
     h1, h2 { text-align: center; color: var(--primary); margin-bottom: 5px; }
     p.sub { text-align: center; color: var(--subtext); font-size: 0.9em; margin-bottom: 20px; }
@@ -20,25 +26,26 @@
     /* Concert End Banner */
     .concert-end-banner { display: none; background: #c62828; border: 1px solid #ff5252; color: #fff; padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; margin-bottom: 20px; font-size: 0.95em; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
 
-    .section { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-    .song-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #333; }
+    .section { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); }
+    .song-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #283559; }
     .song-item:last-child { border-bottom: none; }
     .song-info { display: flex; flex-direction: column; }
     .song-title { font-weight: bold; font-size: 1em; }
     .song-artist { font-size: 0.85em; color: var(--subtext); }
     
-    .upcoming-item { padding: 10px 0; border-bottom: 1px solid #333; display: flex; flex-direction: column; gap: 3px; }
+    .upcoming-item { padding: 10px 0; border-bottom: 1px solid #283559; display: flex; flex-direction: column; gap: 3px; }
     .upcoming-item:last-child { border-bottom: none; }
     .upcoming-date { font-weight: bold; color: var(--primary); font-size: 0.95em; }
     .upcoming-venue { font-size: 0.9em; color: #fff; }
 
-    input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; box-sizing: border-box; }
+    input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #283559; background: #131b2e; color: #fff; box-sizing: border-box; }
+    input[type="text"]:focus { outline: none; border-color: var(--primary); }
     button { background: var(--primary); color: #000; font-weight: bold; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
     button:active { opacity: 0.8; }
     button:disabled { background: #555; color: #888; cursor: not-allowed; opacity: 0.6; }
     
     /* Social Section Top */
-    .social-section { margin-bottom: 25px; padding: 15px; background: var(--card); border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    .social-section { margin-bottom: 25px; padding: 15px; background: var(--card); border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); }
     .social-section p { color: var(--subtext); font-size: 0.9em; margin-bottom: 12px; font-weight: bold; }
     .social-icons { display: flex; justify-content: center; gap: 15px; }
     .social-btn { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; color: #fff; text-decoration: none; font-size: 1.4em; }
@@ -69,10 +76,10 @@
 <body>
 
   <h1>🎸 DUAL SHOCK LIVE</h1>
-  <p class="sub">Pick a song you'd like us to play tonight!</p>
+  <p class="sub">Select the song you want to hear us play tonight!</p>
 
   <div class="lang-switch">
-    <a href="index.html">🇮🇹 Passa all'Italiano</a>
+    <a href="index.html">🇮🇹 Switch to Italian</a>
   </div>
 
   <!-- CONCERT END BANNER -->
@@ -82,16 +89,16 @@
 
   <!-- TOP TIMER BANNER -->
   <div id="timerBanner" class="timer-banner">
-    ⏳ Next song request available in:
+    ⏳ Next request available in:
     <span id="countdown">10:00</span>
   </div>
 
   <div class="section">
-    <!-- NOME UTENTE CON MEMORIA LOCALE E PULSANTE CAMBIA -->
+    <!-- USER NAME WITH LOCAL STORAGE & CHANGE BUTTON -->
     <div id="nameInputContainer">
       <label for="userName" style="font-weight: bold; color: var(--primary);">Your Name:</label>
       <div style="display: flex; gap: 8px; align-items: center; margin-top: 5px;">
-        <input type="text" id="userName" placeholder="e.g. Mark" style="margin: 0; flex: 1;">
+        <input type="text" id="userName" placeholder="E.g. Mark" style="margin: 0; flex: 1;">
         <button onclick="salvaNome()" style="padding: 10px 14px;">Save</button>
       </div>
     </div>
@@ -101,18 +108,18 @@
         <span style="color: var(--subtext); font-size: 0.85em;">Your Name:</span><br>
         <strong id="displayName" style="font-size: 1.1em; color: var(--primary);"></strong>
       </div>
-      <button onclick="abilitaModificaNome()" style="background: #333; color: #fff; border: 1px solid #555; padding: 6px 12px; font-size: 0.85em;">Change</button>
+      <button onclick="abilitaModificaNome()" style="background: #283559; color: #fff; border: 1px solid #4a5568; padding: 6px 12px; font-size: 0.85em;">Change</button>
     </div>
     
-    <label for="dedica" style="font-weight: bold; margin-top: 15px; display: block;">Shoutout / Message (optional):</label>
-    <input type="text" id="dedica" placeholder="e.g. For Anna">
+    <label for="dedica" style="font-weight: bold; margin-top: 15px; display: block;">Dedication or message (optional):</label>
+    <input type="text" id="dedica" placeholder="E.g. For Anna">
   </div>
 
-  <!-- PROSSIMI LIVE SECTION -->
+  <!-- UPCOMING SHOWS SECTION -->
   <div class="section">
     <h2>📅 Upcoming Shows</h2>
     <div id="upcoming-list">
-      <p style="text-align: center; color: var(--subtext); font-size: 0.9em; padding: 10px 0;">No upcoming shows at the moment.</p>
+      <p style="text-align: center; color: var(--subtext); font-size: 0.9em; padding: 10px 0;">No shows scheduled at the moment.</p>
     </div>
   </div>
 
@@ -132,7 +139,7 @@
 
   <div class="section">
     <h2>Song List</h2>
-    <!-- BARRA DI RICERCA -->
+    <!-- SEARCH BAR -->
     <input type="text" id="searchBar" placeholder="🔍 Search by title or artist..." style="margin-bottom: 15px;">
     <div id="song-list"></div>
   </div>
@@ -155,24 +162,24 @@
     const db = getDatabase(app);
 
     const brani = [
-      { t: "A Mano a Mano", a: "Rino Gaetano" },
+      { t: "A Mano a Mano", a: "Rino Gaetano", c: true },
       { t: "Ain’t no Sunshine", a: "Bill Withers" },
       { t: "Back to Black", a: "Amy Winehouse" },
       { t: "Bad Moon Rising", a: "Creedence Clearwater Revival" },
       { t: "Basket Case", a: "Green Day" },
       { t: "Behind Blue Eyes", a: "The Who" },
-      { t: "Black or White", a: "Michael Jackson" },
+      { t: "Black or White", a: "Michael Jackson", c: true },
       { t: "Blue Suede Shoes", a: "Elvis Presley" },
-      { t: "Bohemian Rhapsody", a: "Queen" },
+      { t: "Bohemian Rhapsody", a: "Queen", c: true },
       { t: "Can’t Help Falling in Love", a: "Elvis Presley" },
       { t: "Come and Get Your Love", a: "Redbone" },
       { t: "Come As You Are", a: "Nirvana" },
       { t: "Come Together", a: "The Beatles" },
       { t: "Comfortably Numb", a: "Pink Floyd" },
       { t: "Con le Mani", a: "Zucchero" },
-      { t: "Crawling", a: "Linkin Park" },
+      { t: "Crawling", a: "Linkin Park", c: true },
       { t: "Crazy Little Thing Called Love", a: "Queen" },
-      { t: "Creep", a: "Radiohead" },
+      { t: "Creep", a: "Radiohead", c: true },
       { t: "Diavolo in Me", a: "Zucchero" },
       { t: "Don’t Look back in Anger", a: "Oasis" },
       { t: "Don’t Stop me Now", a: "Queen" },
@@ -183,10 +190,10 @@
       { t: "Every Breath you Take", a: "The Police" },
       { t: "Everybody Hurts", a: "REM" },
       { t: "Everybody Needs Somebody To Love", a: "The Blues Brothers" },
-      { t: "Feeling Good", a: "Nina Simone" },
+      { t: "Feeling Good", a: "Nina Simone", c: true },
       { t: "Fly Away", a: "Lenny Kravitz" },
       { t: "Forever Young", a: "Alphaville" },
-      { t: "Fortunate Son", a: "Creedence Clearwater Revival" },
+      { t: "Fortunate Son", a: "Creedence Clearwater Revival", c: true },
       { t: "Good Riddance (Time of Your Life)", a: "Green Day" },
       { t: "Have You Ever Seen The Rain", a: "Creedence Clearwater Revival" },
       { t: "Heartbreak Hotel", a: "Elvis Presley" },
@@ -202,7 +209,7 @@
       { t: "I Feel Good", a: "James Brown" },
       { t: "I Want to Break Free", a: "Queen" },
       { t: "Il Cielo d'Irlanda", a: "Fiorella Mannoia" },
-      { t: "Il Tempo di Morire", a: "Lucio Battisti" },
+      { t: "Il Tempo di Morire", a: "Lucio Battisti", c: true },
       { t: "Imagine", a: "John Lennon" },
       { t: "In The Summertime", a: "Mungo Jerry" },
       { t: "Isn’t She Lovely", a: "Stevie Wonder" },
@@ -216,7 +223,7 @@
       { t: "Mama Mae", a: "Negrita" },
       { t: "No Woman No Cry", a: "Bob Marley" },
       { t: "Over The Rainbow", a: "Israel Kamakawiwo'ole" },
-      { t: "Personal Jesus", a: "Depeche Mode" },
+      { t: "Personal Jesus", a: "Depeche Mode", c: true },
       { t: "Purple Rain", a: "Prince" },
       { t: "Radioactive", a: "Imagine Dragons" },
       { t: "Rehab", a: "Amy Winehouse" },
@@ -236,7 +243,7 @@
       { t: "Thunderstruck", a: "AC/DC" },
       { t: "Vita Spericolata", a: "Vasco Rossi" },
       { t: "What's Up", a: "4 Non Blondes" },
-      { t: "While My Guitar Gently Weeps", a: "The Beatles" },
+      { t: "While My Guitar Gently Weeps", a: "The Beatles", c: true },
       { t: "Whole Lotta Love", a: "Led Zeppelin" },
       { t: "Why Don’t You Do Right", a: "Peggy Lee" },
       { t: "Wonderwall", a: "Oasis" },
@@ -257,7 +264,7 @@
     let timerInterval = null;
     let concertClosed = false;
 
-    // Local storage name check
+    // Name management on startup
     const savedName = localStorage.getItem('dual_shock_user_name');
     if (savedName) {
       userNameInput.value = savedName;
@@ -284,12 +291,12 @@
       userNameInput.focus();
     };
 
-    // Listen to upcoming shows from Firebase
+    // Listen for upcoming shows in real-time from Firebase
     onValue(ref(db, 'prossimi_live'), (snapshot) => {
       const data = snapshot.val();
       upcomingContainer.innerHTML = '';
       if (!data) {
-        upcomingContainer.innerHTML = '<p style="text-align: center; color: var(--subtext); font-size: 0.9em; padding: 10px 0;">No upcoming shows at the moment.</p>';
+        upcomingContainer.innerHTML = '<p style="text-align: center; color: var(--subtext); font-size: 0.9em; padding: 10px 0;">No shows scheduled at the moment.</p>';
         return;
       }
       Object.keys(data).forEach(key => {
@@ -304,7 +311,7 @@
       });
     });
 
-    // Render song list with search support
+    // Function to render song list with search support and recommended badge
     function renderSongs(filter = '') {
       listContainer.innerHTML = '';
       const query = filter.toLowerCase().trim();
@@ -323,7 +330,7 @@
         item.className = 'song-item';
         item.innerHTML = `
           <div class="song-info">
-            <span class="song-title">${b.t}</span>
+            <span class="song-title">${b.t} ${b.c ? '<span style="font-size: 0.8em; color: #ff9800; margin-left: 6px;">🔥 Recommended</span>' : ''}</span>
             <span class="song-artist">${b.a}</span>
           </div>
           <button class="select-btn" onclick="seleziona('${b.t.replace(/'/g, "\\'")}', '${b.a.replace(/'/g, "\\'")}')">Choose</button>
@@ -399,7 +406,7 @@
 
       let name = localStorage.getItem('dual_shock_user_name') || userNameInput.value.trim();
       if(!name) {
-        alert('Please enter your name at the top before choosing a song!');
+        alert('Enter your name at the top before choosing a song!');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
@@ -408,7 +415,7 @@
 
       const lastRequest = localStorage.getItem('last_song_request_time');
       if (lastRequest && (Date.now() - parseInt(lastRequest, 10) < COOLDOWN_MS)) {
-        alert('⏳ You have already sent a request! Please wait for the timer at the top to expire.');
+        alert('⏳ You have already sent a request! Wait for the timer at the top to expire.');
         return;
       }
 
@@ -427,7 +434,7 @@
         updateTimer();
         timerInterval = setInterval(updateTimer, 1000);
       }).catch(err => {
-        alert('Error sending request: ' + err.message);
+        alert('Error sending: ' + err.message);
       });
     };
   </script>
