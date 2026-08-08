@@ -3,120 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Tag Anti-Cache per forzare l'aggiornamento immediato -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  
   <title>Scegli il brano dal vivo - Dual Shock</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --bg: #0a0a0c;
-      --card-bg: rgba(22, 22, 28, 0.75);
-      --card-border: rgba(255, 152, 0, 0.25);
-      --primary: #ff9800;
-      --primary-neon: #ffaa00;
-      --neon-glow: 0 0 12px rgba(255, 152, 0, 0.4);
-      --text: #f0f0f5;
-      --subtext: #a0a0b0;
+      /* Palette Colori Personalizzata */
+      --bg-dark: #0b0f19;
+      --card-bg: rgba(22, 30, 49, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-cyan: #00f2fe;
+      --accent-purple: #4facfe;
+      --accent-gold: #ffb703;
+      --gradient-accent: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      --text-main: #f1f5f9;
+      --text-sub: #94a3b8;
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      background-image: 
-        radial-gradient(circle at 50% -20%, rgba(255, 152, 0, 0.15), transparent 60%),
-        radial-gradient(circle at 50% 120%, rgba(255, 100, 0, 0.08), transparent 50%);
-      background-attachment: fixed;
-      color: var(--text);
+      background-color: var(--bg-dark);
+      color: var(--text-main);
       margin: 0;
       padding: 15px;
-      min-height: 100vh;
-      box-sizing: border-box;
     }
 
     h1 {
       text-align: center;
-      color: var(--primary-neon);
-      margin-top: 10px;
+      background: var(--gradient-accent);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       margin-bottom: 5px;
-      font-size: 1.8em;
-      letter-spacing: 1.5px;
-      text-shadow: 0 0 10px rgba(255, 152, 0, 0.6), 0 0 20px rgba(255, 152, 0, 0.2);
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--text-main);
+      margin-bottom: 15px;
     }
 
     p.sub {
       text-align: center;
-      color: var(--subtext);
+      color: var(--text-sub);
       font-size: 0.9em;
       margin-bottom: 20px;
     }
 
     .lang-switch {
       text-align: center;
-      margin-bottom: 18px;
+      margin-bottom: 15px;
     }
 
     .lang-switch a {
-      color: var(--primary);
-      font-weight: 600;
+      color: var(--accent-cyan);
+      font-weight: bold;
       text-decoration: none;
-      font-size: 0.85em;
-      padding: 6px 12px;
-      border: 1px solid var(--card-border);
-      border-radius: 20px;
-      background: rgba(255, 152, 0, 0.05);
-      transition: all 0.3s ease;
-    }
-
-    .lang-switch a:hover {
-      box-shadow: var(--neon-glow);
-      background: rgba(255, 152, 0, 0.15);
+      font-size: 0.9em;
+      border-bottom: 1px dashed var(--accent-cyan);
     }
 
     /* Box Banner Timer in Alto */
     .timer-banner {
       display: none;
-      background: rgba(43, 29, 0, 0.85);
-      border: 1px solid var(--primary);
-      color: #ffca28;
-      padding: 14px;
-      border-radius: 14px;
+      background: rgba(255, 183, 3, 0.1);
+      border: 1px solid var(--accent-gold);
+      color: var(--accent-gold);
+      padding: 12px;
+      border-radius: 10px;
       text-align: center;
       font-weight: bold;
       margin-bottom: 20px;
       font-size: 0.95em;
-      box-shadow: 0 0 15px rgba(255, 152, 0, 0.3);
-      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      backdrop-filter: blur(8px);
     }
 
     .timer-banner span {
       display: block;
-      font-size: 1.3em;
+      font-size: 1.2em;
       color: #fff;
       margin-top: 4px;
-      text-shadow: 0 0 8px #ff9800;
     }
 
     .section {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-
-    .section h2 {
-      text-align: center;
-      color: var(--primary);
-      margin-top: 0;
-      margin-bottom: 15px;
-      font-size: 1.3em;
-      letter-spacing: 1px;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 25px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     }
 
     .song-item {
@@ -124,7 +99,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 12px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      border-bottom: 1px solid var(--card-border);
     }
 
     .song-item:last-child {
@@ -134,129 +109,105 @@
     .song-info {
       display: flex;
       flex-direction: column;
-      gap: 3px;
-      padding-right: 10px;
     }
 
     .song-title {
-      font-weight: 600;
+      font-weight: bold;
       font-size: 1em;
-      color: #ffffff;
+      color: var(--text-main);
     }
 
     .song-artist {
       font-size: 0.85em;
-      color: var(--subtext);
+      color: var(--text-sub);
+    }
+
+    label {
+      color: var(--accent-cyan);
     }
 
     input[type="text"] {
       width: 100%;
-      padding: 12px;
-      margin: 8px 0 14px 0;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 152, 0, 0.3);
-      background: rgba(15, 15, 20, 0.8);
-      color: #fff;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid var(--card-border);
+      background: rgba(11, 15, 25, 0.6);
+      color: var(--text-main);
       box-sizing: border-box;
-      font-size: 0.95em;
-      outline: none;
-      transition: all 0.3s ease;
     }
 
     input[type="text"]:focus {
-      border-color: var(--primary);
-      box-shadow: var(--neon-glow);
+      outline: none;
+      border-color: var(--accent-cyan);
     }
 
     button {
-      background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-      color: #000;
+      background: var(--accent-gold);
+      color: #0b0f19;
       font-weight: bold;
       border: none;
-      padding: 9px 16px;
-      border-radius: 8px;
+      padding: 8px 14px;
+      border-radius: 6px;
       cursor: pointer;
-      box-shadow: 0 2px 10px rgba(255, 152, 0, 0.3);
-      transition: all 0.2s ease;
+      transition: transform 0.1s ease, opacity 0.2s ease;
     }
 
-    button:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 0 15px rgba(255, 152, 0, 0.6);
-    }
-
-    button:active:not(:disabled) {
-      transform: translateY(1px);
+    button:active {
+      transform: scale(0.96);
     }
 
     button:disabled {
-      background: #33333d;
-      color: #666675;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-sub);
       cursor: not-allowed;
-      box-shadow: none;
+      opacity: 0.6;
     }
 
     /* Sezione Social in alto */
     .social-section {
-      margin-bottom: 20px;
+      margin-bottom: 25px;
       padding: 15px;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
-      text-align: center;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     }
 
     .social-section p {
-      color: var(--subtext);
-      font-size: 0.88em;
-      margin-top: 0;
+      color: var(--text-sub);
+      font-size: 0.9em;
       margin-bottom: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
+      font-weight: bold;
     }
 
     .social-icons {
       display: flex;
       justify-content: center;
-      gap: 18px;
+      gap: 15px;
     }
 
     .social-btn {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 46px;
-      height: 46px;
+      width: 45px;
+      height: 45px;
       border-radius: 50%;
       color: #fff;
       text-decoration: none;
-      font-size: 1.3em;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    }
-
-    .social-btn:hover {
-      transform: scale(1.1);
+      font-size: 1.4em;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
 
     .instagram {
       background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
     }
 
-    .instagram:hover {
-      box-shadow: 0 0 15px rgba(220, 39, 67, 0.6);
-    }
-
     .facebook {
       background: #1877f2;
-    }
-
-    .facebook:hover {
-      box-shadow: 0 0 15px rgba(24, 119, 242, 0.6);
     }
   </style>
 </head>
@@ -276,10 +227,10 @@
   </div>
 
   <div class="section">
-    <label for="userName" style="font-weight: bold; color: var(--primary);">Il tuo Nome:</label>
+    <label for="userName" style="font-weight: bold;">Il tuo Nome:</label>
     <input type="text" id="userName" placeholder="Es. Marco">
     
-    <label for="dedica" style="font-weight: bold; color: var(--primary); margin-top: 10px; display: block;">Dedica o messaggio (opzionale):</label>
+    <label for="dedica" style="font-weight: bold; margin-top: 10px; display: block;">Dedica o messaggio (opzionale):</label>
     <input type="text" id="dedica" placeholder="Es. Per Anna">
   </div>
 
@@ -403,7 +354,7 @@
       { t: "You Never Can Tell", a: "Chuck Berry" }
     ];
 
-    const COOLDOWN_MS = 10 * 60 * 1000;
+    const COOLDOWN_MS = 10 * 60 * 1000; // 10 Minuti
     const listContainer = document.getElementById('song-list');
     const timerBanner = document.getElementById('timerBanner');
     const countdownEl = document.getElementById('countdown');
