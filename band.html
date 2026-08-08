@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Palco - Dual Shock Live</title>
+  <title>Dashboard Band - Dual Shock Live</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root { --bg: #121212; --card: #1e1e1e; --primary: #00bcd4; --text: #ffffff; --subtext: #aaa; }
@@ -11,60 +11,72 @@
     h1, h2 { text-align: center; color: var(--primary); margin-bottom: 15px; }
     .section { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
     
-    .card { background: #2a2a2a; border-left: 4px solid var(--primary); padding: 12px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-    .req-info { display: flex; flex-direction: column; gap: 4px; }
-    .req-song { font-weight: bold; font-size: 1.1em; color: #fff; }
-    .req-user { font-size: 0.9em; color: var(--primary); }
-    .req-msg { font-size: 0.85em; color: var(--subtext); font-style: italic; }
+    input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; box-sizing: border-box; }
     
-    .btn-done { background: #4caf50; color: #fff; font-weight: bold; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
-    .btn-done:active { opacity: 0.8; }
+    /* Buttons */
+    button { background: var(--primary); color: #000; font-weight: bold; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; }
+    button:active { opacity: 0.8; }
     
-    .history-card { background: #222; border-left: 4px solid #888; padding: 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; opacity: 0.8; }
-    
-    .btn-clear-all { background: #f44336; color: #fff; font-weight: bold; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 10px; font-size: 1em; }
-    
-    /* Toggle Concert Button Styles */
-    .btn-concert-toggle { font-weight: bold; border: none; padding: 12px 16px; border-radius: 8px; cursor: pointer; width: 100%; margin-bottom: 15px; font-size: 1.05em; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: background 0.2s; }
-    .btn-concert-active { background: #d32f2f; color: #fff; } /* Fine Concerto (rosso) */
-    .btn-concert-closed { background: #2e7d32; color: #fff; } /* Inizio Concerto (verde) */
+    .btn-clear-all { background: #d32f2f; color: #fff; width: 100%; margin-bottom: 15px; }
+    .btn-done { background: #388e3c; color: #fff; padding: 6px 12px; font-size: 0.85em; }
+    .btn-delete { background: #d32f2f; color: #fff; padding: 6px 12px; font-size: 0.85em; }
+    .btn-toggle { width: 100%; padding: 12px; font-size: 1em; margin-bottom: 15px; background: #c62828; color: #fff; }
+    .btn-toggle.active { background: #2e7d32; color: #fff; }
 
-    .empty-msg { text-align: center; color: var(--subtext); font-style: italic; padding: 10px; }
-    .counter-badge { background: var(--primary); color: #000; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 0.9em; }
+    /* Cards */
+    .card { background: #2a2a2a; border-radius: 8px; padding: 12px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--primary); }
+    .req-info { display: flex; flex-direction: column; gap: 4px; }
+    .req-song { font-weight: bold; font-size: 1.05em; color: #fff; }
+    .req-user { font-size: 0.85em; color: var(--subtext); }
+    .req-msg { font-size: 0.85em; color: #80deea; font-style: italic; }
+    .empty-msg { text-align: center; color: var(--subtext); font-size: 0.9em; padding: 10px; }
   </style>
 </head>
 <body>
 
-  <h1>📡 Richieste Live in Tempo Reale</h1>
+  <h1>🎸 DUAL SHOCK - PALCO</h1>
 
-  <!-- SEZIONE CONTROLLO STATO CONCERTO -->
+  <!-- TOGGLE CONCERTO CHIUSO / APERTO -->
+  <button id="toggleConcertBtn" class="btn-toggle" onclick="toggleConcerto()">🔴 Fine Concerto (Blocca Richieste)</button>
+
+  <!-- GESTIONE PROSSIMI LIVE -->
   <div class="section">
-    <button id="concertToggleBtn" class="btn-concert-toggle btn-concert-active" onclick="toggleConcertState()">🔴 Fine Concerto</button>
+    <h2>📅 Gestione Prossimi Live</h2>
+    <label for="liveDate" style="font-size: 0.9em; font-weight: bold;">Data e Ora (es. 15 Agosto - Ore 21:30):</label>
+    <input type="text" id="liveDate" placeholder="Es. 15 Agosto - Ore 21:30">
+    
+    <label for="liveVenue" style="font-size: 0.9em; font-weight: bold; margin-top: 10px; display: block;">Locale / Città (es. Caffè Letterario, Roma):</label>
+    <input type="text" id="liveVenue" placeholder="Es. Caffè Letterario, Roma">
+    
+    <button onclick="aggiungiLive()" style="width: 100%; margin-top: 10px;">➕ Aggiungi Concerto</button>
+    
+    <h3 style="font-size: 1em; color: var(--subtext); margin-top: 20px; border-bottom: 1px solid #333; padding-bottom: 5px;">Live in Programma:</h3>
+    <div id="upcoming-admin-list">
+      <p class="empty-msg">Nessun live inserito...</p>
+    </div>
   </div>
 
-  <!-- SEZIONE RICHIESTE ATTIVE -->
+  <!-- RICHIESTE LIVE -->
   <div class="section">
-    <h2>In Attesa</h2>
+    <h2>📡 Richieste Live in Tempo Reale</h2>
+    <button class="btn-clear-all" onclick="svuotaTutto()">🗑️ Azzera tutte le richieste (Fine Serata)</button>
     <div id="requests-container">
       <p class="empty-msg">Nessuna richiesta al momento...</p>
     </div>
   </div>
 
-  <!-- CARTELLA STORICO / BRANI FATTI -->
+  <!-- STORICO BRANI FATTI -->
   <div class="section">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-      <h2 style="margin: 0;">📁 Cartella Storico Brani</h2>
-      <span id="total-count" class="counter-badge">Totale: 0</span>
+    <h2>📁 Storico / Brani Suonati (<span id="storico-count">0</span>)</h2>
+    <button class="btn-clear-all" style="background: #444;" onclick="svuotaStorico()">🗑️ Svuota Storico</button>
+    <div id="storico-container">
+      <p class="empty-msg">Nessun brano nello storico...</p>
     </div>
-    <div id="history-container">
-      <p class="empty-msg">Nessun brano suonato finora...</p>
-    </div>
-    <button class="btn-clear-all" onclick="svuotaTutto()">🗑️ Elimina tutto e azzera per il prossimo live</button>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, remove, push, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDqH7id1aRXulq9CfVjLn9TDu4QYX9Paao",
@@ -80,44 +92,88 @@
     const db = getDatabase(app);
 
     const container = document.getElementById('requests-container');
-    const historyContainer = document.getElementById('history-container');
-    const totalCountEl = document.getElementById('total-count');
-    const concertToggleBtn = document.getElementById('concertToggleBtn');
+    const storicoContainer = document.getElementById('storico-container');
+    const storicoCount = document.getElementById('storico-count');
+    const upcomingAdminList = document.getElementById('upcoming-admin-list');
+    const toggleBtn = document.getElementById('toggleConcertBtn');
 
-    let isConcertClosed = false;
+    let concertClosedState = false;
 
-    // Ascolta lo stato del concerto per aggiornare il pulsante nella pagina band
+    // Gestione Stato Concerto (Aperto/Chiuso)
     onValue(ref(db, 'concerto_chiuso'), (snapshot) => {
-      isConcertClosed = snapshot.val() === true;
-      if (isConcertClosed) {
-        concertToggleBtn.innerText = "🟢 Inizio Concerto";
-        concertToggleBtn.className = "btn-concert-toggle btn-concert-closed";
+      concertClosedState = snapshot.val() === true;
+      if (concertClosedState) {
+        toggleBtn.className = "btn-toggle active";
+        toggleBtn.innerText = "🟢 Inizio Concerto (Riattiva Richieste)";
       } else {
-        concertToggleBtn.innerText = "🔴 Fine Concerto";
-        concertToggleBtn.className = "btn-concert-toggle btn-concert-active";
+        toggleBtn.className = "btn-toggle";
+        toggleBtn.innerText = "🔴 Fine Concerto (Blocca Richieste)";
       }
     });
 
-    // Funzione per attivare/disattivare il concerto
-    window.toggleConcertState = () => {
-      const newState = !isConcertClosed;
+    window.toggleConcerto = () => {
+      const newState = !concertClosedState;
       set(ref(db, 'concerto_chiuso'), newState).then(() => {
-        if (newState) {
-          alert("Concerto terminato: le richieste sono state bloccate e l'avviso è comparso sugli schermi del pubblico.");
-        } else {
-          alert("Concerto riavviato: le richieste sono state riattivate!");
-        }
-      }).catch(err => {
-        alert("Errore nell'aggiornamento dello stato: " + err.message);
+        alert(newState ? '⚠️ Concerto chiuso! Le richieste sono state bloccate nelle pagine index.' : '✨ Concerto aperto! Le richieste sono state riattivate.');
       });
     };
 
-    // Ascolta le richieste attive
+    // Aggiungi un nuovo concerto
+    window.aggiungiLive = () => {
+      const date = document.getElementById('liveDate').value.trim();
+      const venue = document.getElementById('liveVenue').value.trim();
+
+      if (!date || !venue) {
+        alert('Compila sia la data che il locale/città!');
+        return;
+      }
+
+      push(ref(db, 'prossimi_live'), {
+        date: date,
+        venue: venue
+      }).then(() => {
+        alert('📅 Concerto aggiunto con successo!');
+        document.getElementById('liveDate').value = '';
+        document.getElementById('liveVenue').value = '';
+      }).catch(err => {
+        alert('Errore: ' + err.message);
+      });
+    };
+
+    // Cancella un singolo concerto dalla lista
+    window.eliminaLive = (key) => {
+      remove(ref(db, 'prossimi_live/' + key));
+    };
+
+    // Ascolta e mostra i concerti nella pagina band con tasto elimina
+    onValue(ref(db, 'prossimi_live'), (snapshot) => {
+      const data = snapshot.val();
+      upcomingAdminList.innerHTML = '';
+      if (!data) {
+        upcomingAdminList.innerHTML = '<p class="empty-msg">Nessun live inserito...</p>';
+        return;
+      }
+      Object.keys(data).forEach(key => {
+        const item = data[key];
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="req-info">
+            <span class="req-song">📅 ${item.date}</span>
+            <span class="req-user">📍 ${item.venue}</span>
+          </div>
+          <button class="btn-delete" onclick="eliminaLive('${key}')">🗑️ Elimina</button>
+        `;
+        upcomingAdminList.appendChild(card);
+      });
+    });
+
+    // Gestione Richieste Attive
     onValue(ref(db, 'richiesta_live'), (snapshot) => {
       const data = snapshot.val();
       container.innerHTML = '';
 
-      if (!data) {
+      if(!data) {
         container.innerHTML = '<p class="empty-msg">Nessuna richiesta al momento...</p>';
         return;
       }
@@ -132,59 +188,62 @@
             <span class="req-user">👤 Da: ${item.name}</span>
             ${item.message ? `<span class="req-msg">💬 "${item.message}"</span>` : ''}
           </div>
-          <button class="btn-done" onclick="segnaFatta('${key}', '${item.song.replace(/'/g, "\\'")}', '${item.name.replace(/'/g, "\\'")}', '${item.message ? item.message.replace(/'/g, "\\'") : ''}')">✓ Fatta</button>
+          <button class="btn-done" onclick="rimuovi('${key}', '${item.song.replace(/'/g, "\\'")}', '${item.name.replace(/'/g, "\\'")}', '${(item.message || '').replace(/'/g, "\\'")}')">✓ Fatta</button>
         `;
         container.appendChild(card);
       });
     });
 
-    // Ascolta lo storico (cartella brani fatti)
-    onValue(ref(db, 'storico_live'), (snapshot) => {
-      const data = snapshot.val();
-      historyContainer.innerHTML = '';
-
-      if (!data) {
-        historyContainer.innerHTML = '<p class="empty-msg">Nessun brano suonato finora...</p>';
-        totalCountEl.innerText = 'Totale: 0';
-        return;
-      }
-
-      const keys = Object.keys(data);
-      totalCountEl.innerText = `Totale: ${keys.length}`;
-
-      keys.forEach(key => {
-        const item = data[key];
-        const card = document.createElement('div');
-        card.className = 'history-card';
-        card.innerHTML = `
-          <div class="req-info">
-            <span class="req-song" style="font-size: 1em;">🎵 ${item.song}</span>
-            <span class="req-user" style="font-size: 0.8em;">👤 Da: ${item.name}</span>
-          </div>
-          <span style="font-size: 0.8em; color: #4caf50; font-weight: bold;">✔ Suonato</span>
-        `;
-        historyContainer.appendChild(card);
-      });
-    });
-
-    // Funzione quando si clicca "Fatta": sposta da richiesta_live a storico_live
-    window.segnaFatta = (key, song, name, message) => {
+    // Sposta in Storico quando clicchi su Fatta
+    window.rimuovi = (key, song, name, message) => {
       push(ref(db, 'storico_live'), {
         song: song,
         name: name,
         message: message,
-        completedAt: Date.now()
+        timestamp: Date.now()
       }).then(() => {
         remove(ref(db, 'richiesta_live/' + key));
-      }).catch(err => {
-        alert('Errore nello spostamento: ' + err.message);
       });
     };
 
-    // Funzione per azzerare tutto (attive + storico) per la prossima live
     window.svuotaTutto = () => {
-      if (confirm('Vuoi davvero cancellare tutte le richieste attive e svuotare la cartella dello storico per il prossimo live?')) {
+      if(confirm('Vuoi davvero cancellare tutte le richieste arrivate stasera?')) {
         remove(ref(db, 'richiesta_live'));
+      }
+    };
+
+    // Gestione Storico
+    onValue(ref(db, 'storico_live'), (snapshot) => {
+      const data = snapshot.val();
+      storicoContainer.innerHTML = '';
+
+      if(!data) {
+        storicoCount.innerText = '0';
+        storicoContainer.innerHTML = '<p class="empty-msg">Nessun brano nello storico...</p>';
+        return;
+      }
+
+      const keys = Object.keys(data);
+      storicoCount.innerText = keys.length;
+
+      keys.forEach(key => {
+        const item = data[key];
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.borderLeftColor = '#388e3c';
+        card.innerHTML = `
+          <div class="req-info">
+            <span class="req-song">🎵 ${item.song}</span>
+            <span class="req-user">👤 Da: ${item.name}</span>
+            ${item.message ? `<span class="req-msg">💬 "${item.message}"</span>` : ''}
+          </div>
+        `;
+        storicoContainer.appendChild(card);
+      });
+    });
+
+    window.svuotaStorico = () => {
+      if(confirm('Vuoi azzerare lo storico dei brani suonati?')) {
         remove(ref(db, 'storico_live'));
       }
     };
