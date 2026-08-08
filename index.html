@@ -81,7 +81,7 @@
     <div id="song-list"></div>
   </div>
 
-  <!-- NUOVA SEZIONE: CONSIGLI PER I PROSSIMI LIVE -->
+  <!-- CONSIGLI PER I PROSSIMI LIVE -->
   <div class="section">
     <h2>💡 Consigliaci un brano per i prossimi live!</h2>
     <p style="font-size: 0.85em; color: var(--subtext); text-align: center;">Non trovi il tuo brano preferito in scaletta? Proponilo per i nostri prossimi concerti!</p>
@@ -92,7 +92,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, set, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDqH7id1aRXulq9CfVjLn9TDu4QYX9Paao",
@@ -109,10 +109,10 @@
 
     let concertoAttivo = true;
 
-    // Monitora lo stato del concerto da Firebase
+    // Monitora lo stato del concerto
     onValue(ref(db, 'stato_concerto/attivo'), (snapshot) => {
       const val = snapshot.val();
-      concertoAttivo = val !== false; // Di default true se non impostato
+      concertoAttivo = val !== false;
       const closedBanner = document.getElementById('closedBanner');
       
       if (!concertoAttivo) {
@@ -315,12 +315,24 @@
         return;
       }
 
-      push(ref(db, 'proposte_brani'), {
-        song: titolo,
-        artist: artista || 'Non specificato',
-        timestamp: Date.now(),
-        stato: 'da_studiare'
-      }).then(() => {
+      const songId = (titolo + "_" + (artista || 'vari')).toLowerCase().replace(/[^a-z0-9]/g, "_");
+      const propRef = ref(db, 'proposte_brani/' + songId);
+
+      get(propRef).then((snapshot) => {
+        if (snapshot.exists()) {
+          const currentVotes = snapshot.val().voti || 1;
+          update(propRef, {
+            voti: currentVotes + 1
+          });
+        } else {
+          set(propRef, {
+            song: titolo,
+            artist: artista || 'Non specificato',
+            voti: 1,
+            stato: 'da_studiare',
+            timestamp: Date.now()
+          });
+        }
         alert('🎵 Grazie! Abbiamo ricevuto il tuo consiglio per i prossimi live.');
         document.getElementById('propTitolo').value = '';
         document.getElementById('propArtista').value = '';
