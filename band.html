@@ -111,6 +111,14 @@
 
   <button class="btn-clear-all" onclick="svuotaTutto()">🗑️ Azzera tutte le richieste attive</button>
 
+  <!-- CLASSIFICA UTENTI -->
+  <div class="section">
+    <h2>🏆 Classifica Richieste (Fine Concerto)</h2>
+    <div id="leaderboard-container">
+      <p class="empty-msg">Nessuna statistica disponibile...</p>
+    </div>
+  </div>
+
   <div class="section">
     <h2>🎵 Richieste Live in Tempo Reale</h2>
     <div id="requests-container">
@@ -171,6 +179,9 @@
     const btnConcerto = document.getElementById('btnConcerto');
     const bandShowsList = document.getElementById('band-shows-list');
 
+    let rawRichieste = null;
+    let rawStorico = null;
+
     // Gestione stato concerto (chiuso = true, attivo = false)
     onValue(ref(db, 'concerto_chiuso'), (snapshot) => {
       const chiuso = snapshot.val() === true;
@@ -187,54 +198,120 @@
 
     window.toggleConcerto = () => {
       const isCurrentlyClosed = btnConcerto.innerText.includes('Inizia');
-      // Se era chiuso, ora deve aprirsi (false); se era aperto, ora deve chiudersi (true)
       set(ref(db, 'concerto_chiuso'), !isCurrentlyClosed);
     };
 
-    onValue(ref(db, 'richiesta_live'), (snapshot) => {
-      const data = snapshot.val();
-      container.innerHTML = '';
+    function calculateUserCounts() {
+      const counts = {};
+      if (rawRichieste) {
+        Object.values(rawRichieste).forEach(item => {
+          if (item && item.name) {
+            const nameKey = item.name.trim().toLowerCase();
+            if (!counts[nameKey]) counts[nameKey] = { name: item.name, total: 0 };
+            counts[nameKey].total++;
+          }
+        });
+      }
+      if (rawStorico) {
+        Object.values(rawStorico).forEach(item => {
+          if (item && item.name) {
+            const nameKey = item.name.trim().toLowerCase();
+            if (!counts[nameKey]) counts[nameKey] = { name: item.name, total: 0 };
+            counts[nameKey].total++;
+          }
+        });
+      }
+      return counts;
+    }
 
-      if(!data) {
-        container.innerHTML = '<p class="empty-msg">Nessuna richiesta al momento...</p>';
+    function renderLeaderboard() {
+      const leaderboardContainer = document.getElementById('leaderboard-container');
+      if (!leaderboardContainer) return;
+      
+      const counts = calculateUserCounts();
+      const sortedUsers = Object.values(counts).sort((a, b) => b.total - a.total);
+      
+      if (sortedUsers.length === 0) {
+        leaderboardContainer.innerHTML = '<p class="empty-msg">Nessuna statistica disponibile...</p>';
         return;
       }
-
-      Object.keys(data).forEach(key => {
-        const item = data[key];
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <span class="req-song">🎵 ${item.song}</span>
-          <span class="req-user">👤 Da: ${item.name}</span>
-          ${item.message ? `<span class="req-msg">💬 "${item.message}"</span>` : ''}
-          <button class="btn-done" onclick="spostaInStorico('${key}', '${item.song.replace(/'/g, "\\'")}', '${item.name.replace(/'/g, "\\'")}')">✓ Fatta</button>
+      
+      let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+      sortedUsers.forEach((user, index) => {
+        let medal = '';
+        if (index === 0) medal = '🥇 ';
+        else if (index === 1) medal = '🥈 ';
+        else if (index === 2) medal = '🥉 ';
+        else medal = `${index + 1}. `;
+        
+        html += `
+          <div style="display: flex; justify-content: space-between; background: #2a2a2a; padding: 8px 12px; border-radius: 6px; align-items: center;">
+            <span>${medal}<strong>${user.name}</strong></span>
+            <span style="background: var(--primary); color: #000; padding: 2px 8px; border-radius: 12px; font-weight: bold; font-size: 0.9em;">${user.total} ${user.total === 1 ? 'richiesta' : 'richieste'}</span>
+          </div>
         `;
-        container.appendChild(card);
       });
+      html += '</div>';
+      leaderboardContainer.innerHTML = html;
+    }
+
+    function renderAll() {
+      // 1. Render richieste in tempo reale
+      container.innerHTML = '';
+      if(!rawRichieste) {
+        container.innerHTML = '<p class="empty-msg">Nessuna richiesta al momento...</p>';
+      } else {
+        const userCounts = calculateUserCounts();
+        Object.keys(rawRichieste).forEach(key => {
+          const item = rawRichieste[key];
+          const nameKey = item.name ? item.name.trim().toLowerCase() : '';
+          const userTotal = userCounts[nameKey] ? userCounts[nameKey].total : 1;
+
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <span class="req-song">🎵 ${item.song}</span>
+            <span class="req-user">👤 Da: ${item.name} — <b>Richiesta n. ${userTotal}</b></span>
+            ${item.message ? `<span class="req-msg">💬 "${item.message}"</span>` : ''}
+            <button class="btn-done" onclick="spostaInStorico('${key}', '${item.song.replace(/'/g, "\\'")}', '${item.name.replace(/'/g, "\\'")}')">✓ Fatta</button>
+          `;
+          container.appendChild(card);
+        });
+      }
+
+      // 2. Render storico
+      historyContainer.innerHTML = '';
+      if(!rawStorico) {
+        historyContainer.innerHTML = '<p class="empty-msg">Nessun brano nello storico...</p>';
+        totalCountEl.innerText = '0';
+      } else {
+        const keys = Object.keys(rawStorico);
+        totalCountEl.innerText = keys.length;
+        keys.forEach(key => {
+          const item = rawStorico[key];
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.style.borderLeftColor = '#4caf50';
+          card.innerHTML = `
+            <span class="req-song">🎵 ${item.song}</span>
+            <span class="req-user">👤 Suonato per: ${item.name}</span>
+          `;
+          historyContainer.appendChild(card);
+        });
+      }
+
+      // 3. Render classifica
+      renderLeaderboard();
+    }
+
+    onValue(ref(db, 'richiesta_live'), (snapshot) => {
+      rawRichieste = snapshot.val();
+      renderAll();
     });
 
     onValue(ref(db, 'storico_live'), (snapshot) => {
-      const data = snapshot.val();
-      historyContainer.innerHTML = '';
-      if(!data) {
-        historyContainer.innerHTML = '<p class="empty-msg">Nessun brano nello storico...</p>';
-        totalCountEl.innerText = '0';
-        return;
-      }
-      const keys = Object.keys(data);
-      totalCountEl.innerText = keys.length;
-      keys.forEach(key => {
-        const item = data[key];
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.style.borderLeftColor = '#4caf50';
-        card.innerHTML = `
-          <span class="req-song">🎵 ${item.song}</span>
-          <span class="req-user">👤 Suonato per: ${item.name}</span>
-        `;
-        historyContainer.appendChild(card);
-      });
+      rawStorico = snapshot.val();
+      renderAll();
     });
 
     window.spostaInStorico = (key, song, name) => {
