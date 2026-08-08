@@ -226,6 +226,17 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
+  // Helper per la sicurezza dell'HTML (evita attacchi XSS dai testi utente)
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     listenConcertState();
     listenRequests();
@@ -235,7 +246,12 @@
   // GESTIONE STATO CONCERTO
   function listenConcertState() {
     db.ref('stato_concerto').on('value', (snap) => {
-      const isOnline = snap.val() === true;
+      const val = snap.val();
+      
+      // Riconosce sia booleani true/false che stringhe "online", "true", "on"
+      const isOnline = (val === true) || 
+                       (typeof val === 'string' && ['online', 'true', 'on'].includes(val.trim().toLowerCase()));
+
       document.getElementById('toggleState').checked = isOnline;
       const label = document.getElementById('statusLabel');
       label.innerText = isOnline ? "STATO SHOW: ONLINE 🟢" : "STATO SHOW: OFFLINE 🔴";
@@ -243,7 +259,11 @@
 
       // Trasparenza per segnalare che lo show è offline
       const container = document.getElementById('requestsContainer');
-      container.style.opacity = isOnline ? '1' : '0.5';
+      if (container) {
+        container.style.opacity = isOnline ? '1' : '0.5';
+      }
+    }, (error) => {
+      console.error("Errore lettura stato concerto:", error);
     });
   }
 
@@ -269,17 +289,26 @@
 
       reqKeys.forEach(key => {
         const req = data[key];
+        
+        // Sanificazione dei testi di input utente
+        const titolo = escapeHtml(req.titolo || 'Senza titolo');
+        const artista = escapeHtml(req.artista || 'Artista sconosciuto');
+        const dedica = escapeHtml(req.dedica);
+        const utente = escapeHtml(req.utente || 'Anonimo');
+        const livello = escapeHtml(req.livello || '🎧 Spettatore');
+        const orario = escapeHtml(req.orario || '');
+
         const div = document.createElement('div');
         div.className = 'req-card';
         div.innerHTML = `
           <div class="req-info">
-            <h3>${req.titolo || 'Senza titolo'} <span style="font-weight:400; font-size:0.85rem; color:var(--text-sub);">(${req.artista || 'Artista sconosciuto'})</span></h3>
-            ${req.dedica ? `<p style="color:var(--accent-gold);">💬 "${req.dedica}"</p>` : ''}
-            <p style="font-size:0.75rem;">⏰ ${req.orario || ''}</p>
+            <h3>${titolo} <span style="font-weight:400; font-size:0.85rem; color:var(--text-sub);">(${artista})</span></h3>
+            ${dedica ? `<p style="color:var(--accent-gold);">💬 "${dedica}"</p>` : ''}
+            <p style="font-size:0.75rem;">⏰ ${orario}</p>
           </div>
           <div class="req-meta">
-            <span class="req-user">👤 ${req.utente || 'Anonimo'}</span>
-            <span class="req-badge">${req.livello || '🎧 Spettatore'}</span>
+            <span class="req-user">👤 ${utente}</span>
+            <span class="req-badge">${livello}</span>
             <button class="btn-action" style="margin-top:6px;" onclick="deleteRequest('${key}')">Fatto ✓</button>
           </div>
         `;
@@ -318,11 +347,15 @@
 
       Object.keys(dates).forEach(key => {
         const d = dates[key];
+        const dataText = escapeHtml(d.data);
+        const localeText = escapeHtml(d.locale);
+        const cittaText = escapeHtml(d.citta);
+
         const div = document.createElement('div');
         div.className = 'date-row';
         div.innerHTML = `
           <div style="font-size:0.85rem;">
-            <strong>${d.data}</strong> - ${d.locale} (${d.citta})
+            <strong>${dataText}</strong> - ${localeText} (${cittaText})
           </div>
           <button class="btn-action" onclick="deleteDate('${key}')">✕</button>
         `;
