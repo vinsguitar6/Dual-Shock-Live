@@ -4,174 +4,345 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dual Shock - Dashboard Palco</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Firebase Web SDK v9 (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
   <style>
-    :root { --bg: #121212; --card: #1e1e1e; --primary: #ff9800; --text: #ffffff; --subtext: #aaa; --green: #4caf50; --red: #f44336; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
-    h1, h2 { text-align: center; color: var(--primary); margin-bottom: 10px; }
-    
-    .status-box { padding: 12px; border-radius: 8px; text-align: center; font-weight: bold; margin-bottom: 20px; font-size: 1.1em; }
-    .status-active { background: #1b3e20; color: #81c784; border: 1px solid var(--green); }
-    .status-closed { background: #3e1212; color: #e57373; border: 1px solid var(--red); }
+    :root {
+      --bg-dark: #05070e;
+      --card-bg: #111827;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-gold: #f59e0b;
+      --accent-cyan: #06b6d4;
+      --text-main: #f9fafb;
+      --text-sub: #9ca3af;
+    }
 
-    .controls { display: flex; gap: 10px; margin-bottom: 20px; }
-    .controls button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1em; cursor: pointer; color: #fff; }
-    .btn-start { background: var(--green); }
-    .btn-end { background: var(--red); }
-    
-    .section { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-    
-    .req-item { padding: 12px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-    .req-item:last-child { border-bottom: none; }
-    .req-info { display: flex; flex-direction: column; }
-    .req-song { font-weight: bold; font-size: 1.1em; color: var(--primary); }
-    .req-user { font-size: 0.9em; color: var(--text); }
-    .req-msg { font-size: 0.85em; color: var(--subtext); font-style: italic; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
 
-    /* Accordion / Cartella Tendina */
-    details { background: #252525; border-radius: 8px; padding: 10px; border: 1px solid #333; margin-top: 10px; }
-    summary { font-weight: bold; font-size: 1.1em; color: var(--primary); cursor: pointer; padding: 5px; outline: none; }
-    
-    .btn-action { background: #333; color: #fff; border: 1px solid #555; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8em; }
-    .btn-archive { background: #2e7d32; color: #fff; border: none; }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .header-band {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      padding: 16px 24px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .status-toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #374151; transition: .3s; border-radius: 34px;
+    }
+    .slider:before {
+      position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px;
+      background-color: white; transition: .3s; border-radius: 50%;
+    }
+    input:checked + .slider { background-color: var(--accent-green); }
+    input:checked + .slider:before { transform: translateX(26px); }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .grid-container { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 20px;
+    }
+
+    .panel h2 {
+      font-size: 1.2rem;
+      color: var(--accent-cyan);
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Lista Richieste Live */
+    .requests-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .req-card {
+      background: rgba(31, 41, 55, 0.6);
+      border-left: 4px solid var(--accent-cyan);
+      padding: 14px 16px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .req-info h3 { font-size: 1.1rem; color: #fff; }
+    .req-info p { font-size: 0.85rem; color: var(--text-sub); margin-top: 2px; }
+    .req-meta { text-align: right; }
+    .req-user { font-size: 0.9rem; font-weight: 600; color: var(--accent-gold); }
+    .req-badge { font-size: 0.75rem; color: #d1d5db; display: block; margin-top: 2px; }
+
+    .btn-action {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: var(--accent-red);
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    /* Input Date Live */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .form-group input {
+      padding: 10px 14px;
+      background: #1f2937;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #fff;
+    }
+    .btn-add {
+      background: var(--accent-cyan);
+      color: #000;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .date-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
   </style>
 </head>
 <body>
 
-  <h1>🎛️ DUAL SHOCK - CONTROL PALCO</h1>
+  <!-- Header Dashboard -->
+  <div class="header-band">
+    <div>
+      <h1 style="font-size: 1.6rem; color: #fff;">🎸 DUAL SHOCK - Stage Control</h1>
+      <p style="color: var(--text-sub); font-size: 0.85rem;">Dashboard per la gestione delle richieste live e delle date</p>
+    </div>
 
-  <!-- STATO CONCERTO -->
-  <div id="statusBox" class="status-box status-active">
-    LIVE ATTIVO - Ricezione richieste aperta
+    <div class="status-toggle">
+      <span style="font-weight: 600;" id="statusLabel">STATO SHOW: OFFLINE</span>
+      <label class="switch">
+        <input type="checkbox" id="toggleState" onchange="toggleConcertState(this.checked)">
+        <span class="slider"></span>
+      </label>
+    </div>
   </div>
 
-  <div class="controls">
-    <button class="btn-start" onclick="setStatoConcerto(true)">▶️ Inizio Concerto</button>
-    <button class="btn-end" onclick="setStatoConcerto(false)">⏹️ Fine Concerto</button>
+  <div class="grid-container">
+    <!-- Pannello Richieste In Tempo Reale -->
+    <div class="panel">
+      <h2>
+        <span>🎵 Richieste dal Pubblico</span>
+        <button class="btn-action" onclick="clearAllRequests()">Svuota Tutte</button>
+      </h2>
+
+      <div class="requests-list" id="requestsContainer">
+        <p style="color: var(--text-sub); font-size: 0.9rem;">In attesa di nuove richieste...</p>
+      </div>
+    </div>
+
+    <!-- Pannello Gestione Date Concerti -->
+    <div class="panel">
+      <h2>📅 Gestione Prossime Date</h2>
+
+      <div class="form-group">
+        <input type="text" id="dateInput" placeholder="Data (es. 25 Agosto)">
+        <input type="text" id="venueInput" placeholder="Locale / Pub (es. Retrogusto)">
+        <input type="text" id="cityInput" placeholder="Città (es. Bolsena)">
+        <button class="btn-add" onclick="addDate()">+ Aggiungi Data Live</button>
+      </div>
+
+      <h3 style="font-size: 0.9rem; color: var(--text-sub); margin-bottom: 10px;">Date Salvate:</h3>
+      <div id="datesContainer"></div>
+    </div>
   </div>
 
-  <!-- RICHIESTE IN TEMPO REALE SERATA -->
-  <div class="section">
-    <h2>🎵 Richieste Live Serata</h2>
-    <div id="richieste-list">In attesa di richieste...</div>
-  </div>
+<script>
+  const firebaseConfig = {
+    apiKey: "TUO_API_KEY",
+    authDomain: "TUO_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://TUO_PROJECT_ID-default-rtdb.firebaseio.com",
+    projectId: "TUO_PROJECT_ID",
+    storageBucket: "TUO_PROJECT_ID.appspot.com",
+    messagingSenderId: "TUO_SENDER_ID",
+    appId: "TUO_APP_ID"
+  };
 
-  <!-- PROPOSTE PER I PROSSIMI LIVE (CARTELLA A TENDINA) -->
-  <div class="section">
-    <details>
-      <summary>📁 Proposte Brani per i Prossimi Live (<span id="countProposte">0</span>)</summary>
-      <div id="proposte-list" style="margin-top: 15px;">Apertura cartella in corso...</div>
-    </details>
-  </div>
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  document.addEventListener('DOMContentLoaded', () => {
+    listenConcertState();
+    listenRequests();
+    listenDates();
+  });
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDqH7id1aRXulq9CfVjLn9TDu4QYX9Paao",
-      authDomain: "dual-shock-live.firebaseapp.com",
-      databaseURL: "https://dual-shock-live-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "dual-shock-live",
-      storageBucket: "dual-shock-live.firebasestorage.app",
-      messagingSenderId: "231528691879",
-      appId: "1:231528691879:web:1e0fdcea4a8f17815e0382"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-    // 1. Gestione Stato Concerto
-    window.setStatoConcerto = (attivo) => {
-      set(ref(db, 'stato_concerto/attivo'), attivo).then(() => {
-        alert(attivo ? '▶️ Concerto Avviato! Le richieste sono aperte.' : '⏹️ Concerto Terminato! Le richieste sono state bloccate.');
-      });
-    };
-
-    onValue(ref(db, 'stato_concerto/attivo'), (snapshot) => {
-      const attivo = snapshot.val() !== false;
-      const statusBox = document.getElementById('statusBox');
-      if (attivo) {
-        statusBox.innerText = '🟢 LIVE ATTIVO - Ricezione richieste APERTA';
-        statusBox.className = 'status-box status-active';
-      } else {
-        statusBox.innerText = '🔴 CONCERTO CHIUSO - Richieste BLOCCATE';
-        statusBox.className = 'status-box status-closed';
-      }
+  // GESTIONE STATO CONCERTO
+  function listenConcertState() {
+    db.ref('stato_concerto').on('value', (snap) => {
+      const isOnline = snap.val() === true;
+      document.getElementById('toggleState').checked = isOnline;
+      const label = document.getElementById('statusLabel');
+      label.innerText = isOnline ? "STATO SHOW: ONLINE 🟢" : "STATO SHOW: OFFLINE 🔴";
+      label.style.color = isOnline ? "#10b981" : "#ef4444";
     });
+  }
 
-    // 2. Ascolto Richieste Live Serata
-    onValue(ref(db, 'richiesta_live'), (snapshot) => {
-      const list = document.getElementById('richieste-list');
-      list.innerHTML = '';
-      const data = snapshot.val();
+  function toggleConcertState(val) {
+    db.ref('stato_concerto').set(val);
+  }
+
+  // ASCOLTO E RENDERING RICHIESTE
+  function listenRequests() {
+    db.ref('richieste').on('value', (snap) => {
+      const data = snap.val();
+      const container = document.getElementById('requestsContainer');
+      container.innerHTML = '';
 
       if (!data) {
-        list.innerHTML = '<p style="color: var(--subtext); text-align: center;">Nessuna richiesta al momento.</p>';
+        container.innerHTML = '<p style="color: var(--text-sub); font-size: 0.9rem;">Nessuna richiesta al momento.</p>';
         return;
       }
 
-      Object.keys(data).reverse().forEach(key => {
-        const item = data[key];
+      // Converte in array e inverte l'ordine per avere le più recenti in alto
+      const reqKeys = Object.keys(data).reverse();
+
+      reqKeys.forEach(key => {
+        const req = data[key];
         const div = document.createElement('div');
-        div.className = 'req-item';
+        div.className = 'req-card';
         div.innerHTML = `
           <div class="req-info">
-            <span class="req-song">${item.song}</span>
-            <span class="req-user">👤 Richiesto da: ${item.name}</span>
-            ${item.message ? `<span class="req-msg">💬 "${item.message}"</span>` : ''}
+            <h3>${req.titolo} <span style="font-weight:400; font-size:0.85rem; color:var(--text-sub);">(${req.artista})</span></h3>
+            ${req.dedica ? `<p style="color:var(--accent-gold);">💬 "${req.dedica}"</p>` : ''}
+            <p style="font-size:0.75rem;">⏰ ${req.orario}</p>
           </div>
-          <button class="btn-action" onclick="eliminaRichiesta('${key}')">❌ Suonato</button>
+          <div class="req-meta">
+            <span class="req-user">👤 ${req.utente}</span>
+            <span class="req-badge">${req.livello || '🎧 Spettatore'}</span>
+            <button class="btn-action" style="margin-top:6px;" onclick="deleteRequest('${key}')">Fatto ✓</button>
+          </div>
         `;
-        list.appendChild(div);
+        container.appendChild(div);
       });
     });
+  }
 
-    window.eliminaRichiesta = (key) => {
-      remove(ref(db, 'richiesta_live/' + key));
-    };
+  function deleteRequest(key) {
+    db.ref(`richieste/${key}`).remove();
+  }
 
-    // 3. Ascolto Proposte Prossimi Live (con contatore voti)
-    onValue(ref(db, 'proposte_brani'), (snapshot) => {
-      const list = document.getElementById('proposte-list');
-      const countEl = document.getElementById('countProposte');
-      list.innerHTML = '';
-      const data = snapshot.val();
+  function clearAllRequests() {
+    if (confirm("Vuoi cancellare tutte le richieste presenti sulla dashboard?")) {
+      db.ref('richieste').remove();
+    }
+  }
 
-      if (!data) {
-        countEl.innerText = '0';
-        list.innerHTML = '<p style="color: var(--subtext);">Nessuna proposta inviata dal pubblico.</p>';
+  // GESTIONE PROSSIME DATE
+  function listenDates() {
+    db.ref('prossime_date').on('value', (snap) => {
+      const dates = snap.val();
+      const container = document.getElementById('datesContainer');
+      container.innerHTML = '';
+
+      if (!dates) {
+        container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-sub);">Nessuna data futura inserita.</p>';
         return;
       }
 
-      let count = 0;
-      const proposteArray = Object.keys(data).map(key => ({ key, ...data[key] }));
-      proposteArray.sort((a, b) => (b.voti || 1) - (a.voti || 1));
-
-      proposteArray.forEach(item => {
-        if (item.stato !== 'archiviato') {
-          count++;
-          const div = document.createElement('div');
-          div.className = 'req-item';
-          div.innerHTML = `
-            <div class="req-info">
-              <span class="req-song">${item.song} <span style="color: var(--primary); font-size: 0.9em;">(🔥 ${item.voti || 1} ${item.voti > 1 ? 'richieste' : 'richiesta'})</span></span>
-              <span class="req-user">🎤 Artista: ${item.artist}</span>
-            </div>
-            <button class="btn-action btn-archive" onclick="archiviaProposta('${item.key}')">✅ Segna come Studiato</button>
-          `;
-          list.appendChild(div);
-        }
+      Object.keys(dates).forEach(key => {
+        const d = dates[key];
+        const div = document.createElement('div');
+        div.className = 'date-row';
+        div.innerHTML = `
+          <div style="font-size:0.85rem;">
+            <strong>${d.data}</strong> - ${d.locale} (${d.citta})
+          </div>
+          <button class="btn-action" onclick="deleteDate('${key}')">✕</button>
+        `;
+        container.appendChild(div);
       });
-
-      countEl.innerText = count.toString();
-      if (count === 0) {
-        list.innerHTML = '<p style="color: var(--subtext);">Tutte le proposte sono state archiviate o non ce ne sono di nuove!</p>';
-      }
     });
+  }
 
-    window.archiviaProposta = (key) => {
-      update(ref(db, 'proposte_brani/' + key), { stato: 'archiviato' });
-    };
-  </script>
+  function addDate() {
+    const dataVal = document.getElementById('dateInput').value.trim();
+    const localeVal = document.getElementById('venueInput').value.trim();
+    const cittaVal = document.getElementById('cityInput').value.trim();
+
+    if (!dataVal || !localeVal) {
+      alert("Inserisci almeno la data e il nome del locale!");
+      return;
+    }
+
+    db.ref('prossime_date').push({
+      data: dataVal,
+      locale: localeVal,
+      citta: cittaVal || 'Viterbo e prov.'
+    }).then(() => {
+      document.getElementById('dateInput').value = '';
+      document.getElementById('venueInput').value = '';
+      document.getElementById('cityInput').value = '';
+    });
+  }
+
+  function deleteDate(key) {
+    db.ref(`prossime_date/${key}`).remove();
+  }
+</script>
+
 </body>
 </html>
