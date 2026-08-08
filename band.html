@@ -101,6 +101,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      transition: opacity 0.3s ease;
     }
 
     .req-card {
@@ -211,6 +212,7 @@
   </div>
 
 <script>
+  // SOSTITUISCI CON LE TUE CREDENZIALI REALI DI FIREBASE
   const firebaseConfig = {
     apiKey: "TUO_API_KEY",
     authDomain: "TUO_PROJECT_ID.firebaseapp.com",
@@ -238,11 +240,17 @@
       const label = document.getElementById('statusLabel');
       label.innerText = isOnline ? "STATO SHOW: ONLINE 🟢" : "STATO SHOW: OFFLINE 🔴";
       label.style.color = isOnline ? "#10b981" : "#ef4444";
+
+      // Trasparenza per segnalare che lo show è offline
+      const container = document.getElementById('requestsContainer');
+      container.style.opacity = isOnline ? '1' : '0.5';
     });
   }
 
   function toggleConcertState(val) {
-    db.ref('stato_concerto').set(val);
+    db.ref('stato_concerto').set(val).catch(err => {
+      alert("Errore nell'aggiornamento dello stato dello show: " + err.message);
+    });
   }
 
   // ASCOLTO E RENDERING RICHIESTE
@@ -257,7 +265,6 @@
         return;
       }
 
-      // Converte in array e inverte l'ordine per avere le più recenti in alto
       const reqKeys = Object.keys(data).reverse();
 
       reqKeys.forEach(key => {
@@ -266,28 +273,34 @@
         div.className = 'req-card';
         div.innerHTML = `
           <div class="req-info">
-            <h3>${req.titolo} <span style="font-weight:400; font-size:0.85rem; color:var(--text-sub);">(${req.artista})</span></h3>
+            <h3>${req.titolo || 'Senza titolo'} <span style="font-weight:400; font-size:0.85rem; color:var(--text-sub);">(${req.artista || 'Artista sconosciuto'})</span></h3>
             ${req.dedica ? `<p style="color:var(--accent-gold);">💬 "${req.dedica}"</p>` : ''}
-            <p style="font-size:0.75rem;">⏰ ${req.orario}</p>
+            <p style="font-size:0.75rem;">⏰ ${req.orario || ''}</p>
           </div>
           <div class="req-meta">
-            <span class="req-user">👤 ${req.utente}</span>
+            <span class="req-user">👤 ${req.utente || 'Anonimo'}</span>
             <span class="req-badge">${req.livello || '🎧 Spettatore'}</span>
             <button class="btn-action" style="margin-top:6px;" onclick="deleteRequest('${key}')">Fatto ✓</button>
           </div>
         `;
         container.appendChild(div);
       });
+    }, (error) => {
+      console.error("Errore lettura richieste:", error);
     });
   }
 
   function deleteRequest(key) {
-    db.ref(`richieste/${key}`).remove();
+    db.ref(`richieste/${key}`).remove().catch(err => {
+      alert("Errore nell'eliminazione della richiesta: " + err.message);
+    });
   }
 
   function clearAllRequests() {
     if (confirm("Vuoi cancellare tutte le richieste presenti sulla dashboard?")) {
-      db.ref('richieste').remove();
+      db.ref('richieste').remove().catch(err => {
+        alert("Errore durante lo svuotamento: " + err.message);
+      });
     }
   }
 
@@ -315,6 +328,8 @@
         `;
         container.appendChild(div);
       });
+    }, (error) => {
+      console.error("Errore lettura date:", error);
     });
   }
 
@@ -336,11 +351,16 @@
       document.getElementById('dateInput').value = '';
       document.getElementById('venueInput').value = '';
       document.getElementById('cityInput').value = '';
+    }).catch((error) => {
+      console.error("Errore nell'inserimento della data:", error);
+      alert("Impossibile salvare la data: " + error.message);
     });
   }
 
   function deleteDate(key) {
-    db.ref(`prossime_date/${key}`).remove();
+    db.ref(`prossime_date/${key}`).remove().catch(err => {
+      alert("Errore nella rimozione della data: " + err.message);
+    });
   }
 </script>
 
