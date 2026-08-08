@@ -3,171 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dual Shock Live - Pick a song</title>
+  <title>Pick a Live Song - Dual Shock</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root {
-      --bg: #121212;
-      --card: #1e1e1e;
-      --primary: #00bcd4;
-      --text: #ffffff;
-      --subtext: #b0b0b0;
-    }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 20px;
-      max-width: 600px;
-      margin: auto;
-    }
-    h1 {
-      text-align: center;
-      color: var(--primary);
-      margin-bottom: 5px;
-    }
-    p.sub {
-      text-align: center;
-      color: var(--subtext);
-      margin-bottom: 20px;
-    }
-    .lang-switch {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .lang-switch a {
-      color: var(--primary);
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .timer-banner {
-      background: #2a2a2a;
-      border: 1px solid var(--primary);
-      color: var(--primary);
-      padding: 12px;
-      border-radius: 8px;
-      text-align: center;
-      font-weight: bold;
-      margin-bottom: 20px;
-      display: none;
-    }
-    .section {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 25px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    }
-    .song-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #333;
-    }
-    .song-item:last-child {
-      border-bottom: none;
-    }
-    .song-info {
-      display: flex;
-      flex-direction: column;
-    }
-    .song-title {
-      font-weight: bold;
-      font-size: 1em;
-    }
-    .song-artist {
-      font-size: 0.85em;
-      color: var(--subtext);
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 6px;
-      border: 1px solid #444;
-      background: #2a2a2a;
-      color: #fff;
-      box-sizing: border-box;
-    }
-    button {
-      background: var(--primary);
-      color: #000;
-      font-weight: bold;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    button:active {
-      opacity: 0.8;
-    }
-    button:disabled {
-      background: #555;
-      color: #888;
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-    .social-section {
-      margin-bottom: 25px;
-      padding: 15px;
-      background: var(--card);
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    }
-    .social-section p {
-      color: var(--subtext);
-      font-size: 0.9em;
-      margin-bottom: 12px;
-      font-weight: bold;
-    }
-    .social-icons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-    .social-btn {
-      display: flex;
+    :root { --bg: #121212; --card: #1e1e1e; --primary: #00bcd4; --text: #ffffff; --subtext: #aaa; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
+    h1, h2 { text-align: center; color: var(--primary); margin-bottom: 5px; }
+    p.sub { text-align: center; color: var(--subtext); font-size: 0.9em; margin-bottom: 20px; }
+    .lang-switch { text-align: center; margin-bottom: 15px; }
+    .lang-switch a { color: var(--primary); font-weight: bold; text-decoration: underline; font-size: 0.9em; }
+    
+    /* Top Timer Banner Box */
+    .timer-banner { display: none; background: #002b3d; border: 1px solid var(--primary); color: #80deea; padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; margin-bottom: 20px; font-size: 0.95em; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .timer-banner span { display: block; font-size: 1.2em; color: #fff; margin-top: 4px; }
+
+    /* Concert End Banner */
+    .concert-end-banner { display: none; background: #c62828; border: 1px solid #ff5252; color: #fff; padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; margin-bottom: 20px; font-size: 0.95em; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+    .section { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    .song-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #333; }
+    .song-item:last-child { border-bottom: none; }
+    .song-info { display: flex; flex-direction: column; }
+    .song-title { font-weight: bold; font-size: 1em; }
+    .song-artist { font-size: 0.85em; color: var(--subtext); }
+    
+    .upcoming-item { padding: 10px 0; border-bottom: 1px solid #333; display: flex; flex-direction: column; gap: 3px; }
+    .upcoming-item:last-child { border-bottom: none; }
+    .upcoming-date { font-weight: bold; color: var(--primary); font-size: 0.95em; }
+    .upcoming-venue { font-size: 0.9em; color: #fff; }
+
+    input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; box-sizing: border-box; }
+    button { background: var(--primary); color: #000; font-weight: bold; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
+    button:active { opacity: 0.8; }
+    button:disabled { background: #555; color: #888; cursor: not-allowed; opacity: 0.6; }
+    
+    /* Social Section Top */
+    .social-section { margin-bottom: 25px; padding: 15px; background: var(--card); border-radius: 12px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    .social-section p { color: var(--subtext); font-size: 0.9em; margin-bottom: 12px; font-weight: bold; }
+    .social-icons { display: flex; justify-content: center; gap: 15px; }
+    .social-btn { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; color: #fff; text-decoration: none; font-size: 1.4em; }
+    .instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+    .facebook { background: #1877f2; }
+    
+    /* PayPal Button Style */
+    .paypal-btn {
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
+      gap: 8px;
+      background: #0070ba;
       color: #fff;
-      text-decoration: none;
-      font-size: 1.4em;
-    }
-    .instagram {
-      background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-    }
-    .facebook {
-      background: #1877f2;
-    }
-    .beer-btn {
-      display: block;
-      width: 100%;
-      background: #ffc107;
-      color: #000;
-      text-align: center;
-      padding: 12px;
+      padding: 10px 20px;
       border-radius: 8px;
       font-weight: bold;
       text-decoration: none;
-      margin-bottom: 25px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      font-size: 0.95em;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: opacity 0.2s;
     }
-    .show-item {
-      padding: 10px 0;
-      border-bottom: 1px solid #333;
-    }
-    .show-item:last-child {
-      border-bottom: none;
-    }
-    .show-date {
-      color: var(--primary);
-      font-weight: bold;
+    .paypal-btn:hover {
+      opacity: 0.9;
     }
   </style>
 </head>
@@ -177,61 +72,69 @@
   <p class="sub">Pick a song you'd like us to play tonight!</p>
 
   <div class="lang-switch">
-    <a href="index.html">🇮🇹 Passa all'Italiano</a>
+    <a href="index.html">🇮🇹 Switch to Italian</a>
+  </div>
+
+  <!-- CONCERT END BANNER -->
+  <div id="concertEndBanner" class="concert-end-banner">
+    ⚠️ The concert is about to end! Song requests are temporarily disabled.
   </div>
 
   <!-- TOP TIMER BANNER -->
   <div id="timerBanner" class="timer-banner">
-    ⏳ Next song request available in: <span id="countdown">10:00</span>
-  </div>
-
-  <!-- CONCERT CLOSED BANNER -->
-  <div id="concertoBanner" class="timer-banner" style="background: #d32f2f; border-color: #f44336; color: #fff; display: none;">
-    ⚠️ The concert is about to end! Requests are temporarily closed.
+    ⏳ Next request available in:
+    <span id="countdown">10:00</span>
   </div>
 
   <div class="section">
-    <div id="nameSection">
+    <!-- USER NAME WITH LOCAL STORAGE AND CHANGE BUTTON -->
+    <div id="nameInputContainer">
       <label for="userName" style="font-weight: bold; color: var(--primary);">Your Name:</label>
-      <div style="display: flex; gap: 10px;">
-        <input type="text" id="userName" placeholder="e.g. Mark">
-        <button id="saveNameBtn" style="margin-top: 8px;" onclick="salvaNome()">Save</button>
+      <div style="display: flex; gap: 8px; align-items: center; margin-top: 5px;">
+        <input type="text" id="userName" placeholder="e.g. Mark" style="margin: 0; flex: 1;">
+        <button onclick="salvaNome()" style="padding: 10px 14px;">Save</button>
       </div>
     </div>
-    <div id="savedNameSection" style="display: none; align-items: center; justify-content: space-between; margin-top: 8px;">
-      <span>👤 Name: <strong id="displayName" style="color: var(--primary);"></strong></span>
-      <button onclick="cambiaNome()" style="background: #444; color: #fff; padding: 5px 10px; font-size: 0.85em;">Change</button>
-    </div>
 
-    <label for="dedica" style="font-weight: bold; margin-top: 15px; display: block;">Shoutout / Message (optional):</label>
+    <div id="nameDisplayContainer" style="display: none; justify-content: space-between; align-items: center; padding: 5px 0;">
+      <div>
+        <span style="color: var(--subtext); font-size: 0.85em;">Your Name:</span><br>
+        <strong id="displayName" style="font-size: 1.1em; color: var(--primary);"></strong>
+      </div>
+      <button onclick="abilitaModificaNome()" style="background: #333; color: #fff; border: 1px solid #555; padding: 6px 12px; font-size: 0.85em;">Change</button>
+    </div>
+    
+    <label for="dedica" style="font-weight: bold; margin-top: 15px; display: block;">Shoutout or message (optional):</label>
     <input type="text" id="dedica" placeholder="e.g. For Anna">
-  </div>
-
-  <!-- SOCIAL SECTION TOP -->
-  <div class="social-section">
-    <p>Follow us on our social channels!</p>
-    <div class="social-icons">
-      <a href="https://www.instagram.com/dual_shock_duo?igsh=MTRjdmVvMTl1MzNhdw%3D%3D&utm_source=qr" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
-      <a href="https://www.facebook.com/share/18HKLuiHnc/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
-    </div>
-  </div>
-
-  <!-- BUY US A BEER BUTTON -->
-  <a href="https://www.paypal.me/oblyvionliberoit" target="_blank" class="beer-btn">
-    🍻 Buy us a beer
-  </a>
-
-  <!-- SONG LIST SECTION -->
-  <div class="section">
-    <h2>Song List</h2>
-    <input type="text" id="searchSong" placeholder="🔍 Search song or artist..." oninput="filtraBrani()" style="margin-bottom: 15px;">
-    <div id="song-list"></div>
   </div>
 
   <!-- UPCOMING SHOWS SECTION -->
   <div class="section">
     <h2>📅 Upcoming Shows</h2>
-    <div id="shows-list"><p style="color: var(--subtext); font-size: 0.9em;">No upcoming shows scheduled at the moment.</p></div>
+    <div id="upcoming-list">
+      <p style="text-align: center; color: var(--subtext); font-size: 0.9em; padding: 10px 0;">No upcoming shows scheduled at the moment.</p>
+    </div>
+  </div>
+
+  <!-- TOP SOCIAL & PAYPAL SECTION -->
+  <div class="social-section">
+    <p>Follow us on our social channels or support us!</p>
+    <div class="social-icons" style="margin-bottom: 15px;">
+      <a href="https://www.instagram.com/dual_shock_duo?igsh=MTRjdmVvMTl1MzNhdw%3D%3D&utm_source=qr" target="_blank" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
+      <a href="https://www.facebook.com/share/18HKLuiHnc/?mibextid=wwXIfr" target="_blank" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
+    </div>
+    <div>
+      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=oblyvion@libero.it&currency_code=EUR" target="_blank" class="paypal-btn">
+        <i class="fab fa-paypal"></i> Buy us a beer 🍻
+      </a>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Song List</h2>
+    <!-- SEARCH BAR -->
+    <input type="text" id="searchBar" placeholder="🔍 Search by title or artist..." style="margin-bottom: 15px;">
+    <div id="song-list"></div>
   </div>
 
   <script type="module">
@@ -251,31 +154,172 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const COOLDOWN_MS = 10 * 60 * 1000;
-    const listContainer = document.getElementById('song-list');
-    const timerBanner = document.getElementById('timerBanner');
-    const countdownEl = document.getElementById('countdown');
-    const concertoBanner = document.getElementById('concertoBanner');
-    const showsContainer = document.getElementById('shows-list');
-
-    let concertoChiuso = false;
-    let timerInterval = null;
-
     const brani = [
-      { t: "Knocking on heaven's door", a: "Bob Dylan" },
-      { t: "Wonderwall", a: "Oasis" },
-      { t: "Hallelujah", a: "Leonard Cohen" },
+      { t: "A Mano a Mano", a: "Rino Gaetano" },
+      { t: "Ain’t no Sunshine", a: "Bill Withers" },
+      { t: "Back to Black", a: "Amy Winehouse" },
       { t: "Bad Moon Rising", a: "Creedence Clearwater Revival" },
-      { t: "Stand by Me", a: "Ben E. King" }
+      { t: "Basket Case", a: "Green Day" },
+      { t: "Behind Blue Eyes", a: "The Who" },
+      { t: "Black or White", a: "Michael Jackson" },
+      { t: "Blue Suede Shoes", a: "Elvis Presley" },
+      { t: "Bohemian Rhapsody", a: "Queen" },
+      { t: "Can’t Help Falling in Love", a: "Elvis Presley" },
+      { t: "Come and Get Your Love", a: "Redbone" },
+      { t: "Come As You Are", a: "Nirvana" },
+      { t: "Come Together", a: "The Beatles" },
+      { t: "Comfortably Numb", a: "Pink Floyd" },
+      { t: "Con le Mani", a: "Zucchero" },
+      { t: "Crawling", a: "Linkin Park" },
+      { t: "Crazy Little Thing Called Love", a: "Queen" },
+      { t: "Creep", a: "Radiohead" },
+      { t: "Diavolo in Me", a: "Zucchero" },
+      { t: "Don’t Look back in Anger", a: "Oasis" },
+      { t: "Don’t Stop me Now", a: "Queen" },
+      { t: "E la luna Bussò", a: "Loredana Bertè" },
+      { t: "Eleanor Rigby", a: "The Beatles" },
+      { t: "Enjoy the Silence", a: "Depeche Mode" },
+      { t: "Eppure Sentire", a: "Elisa" },
+      { t: "Every Breath you Take", a: "The Police" },
+      { t: "Everybody Hurts", a: "REM" },
+      { t: "Everybody Needs Somebody To Love", a: "The Blues Brothers" },
+      { t: "Feeling Good", a: "Nina Simone" },
+      { t: "Fly Away", a: "Lenny Kravitz" },
+      { t: "Forever Young", a: "Alphaville" },
+      { t: "Fortunate Son", a: "Creedence Clearwater Revival" },
+      { t: "Good Riddance (Time of Your Life)", a: "Green Day" },
+      { t: "Have You Ever Seen The Rain", a: "Creedence Clearwater Revival" },
+      { t: "Heartbreak Hotel", a: "Elvis Presley" },
+      { t: "Hey Jude", a: "The Beatles" },
+      { t: "Hey Ya", a: "Outkast" },
+      { t: "Hold the Line", a: "Toto" },
+      { t: "Holiday", a: "Green Day" },
+      { t: "Hotel California", a: "Eagles" },
+      { t: "Hound Dog", a: "Elvis Presley" },
+      { t: "Hysteria", a: "Muse" },
+      { t: "I Can’t Get No Satisfaction", a: "Rolling Stones" },
+      { t: "I Don’t Want to Miss a Thing", a: "Aerosmith" },
+      { t: "I Feel Good", a: "James Brown" },
+      { t: "I Want to Break Free", a: "Queen" },
+      { t: "Il Cielo d'Irlanda", a: "Fiorella Mannoia" },
+      { t: "Il Tempo di Morire", a: "Lucio Battisti" },
+      { t: "Imagine", a: "John Lennon" },
+      { t: "In The Summertime", a: "Mungo Jerry" },
+      { t: "Isn’t She Lovely", a: "Stevie Wonder" },
+      { t: "Jumping Jack Flash", a: "Rolling Stones" },
+      { t: "Karma Police", a: "Radiohead" },
+      { t: "Knocking on Heaven Door", a: "Bob Dylan" },
+      { t: "Let it Be", a: "The Beatles" },
+      { t: "Little Wing", a: "Jimi Hendrix" },
+      { t: "Mad World", a: "Gary Jules" },
+      { t: "Magnolia", a: "Negrita" },
+      { t: "Mama Mae", a: "Negrita" },
+      { t: "No Woman No Cry", a: "Bob Marley" },
+      { t: "Over The Rainbow", a: "Israel Kamakawiwo'ole" },
+      { t: "Personal Jesus", a: "Depeche Mode" },
+      { t: "Purple Rain", a: "Prince" },
+      { t: "Radioactive", a: "Imagine Dragons" },
+      { t: "Rehab", a: "Amy Winehouse" },
+      { t: "Roadhouse Blues", a: "The Doors" },
+      { t: "Rock Around The Clock", a: "Bill Haley" },
+      { t: "Sally", a: "Vasco Rossi" },
+      { t: "Shine On You Crazy Diamond", a: "Pink Floyd" },
+      { t: "Smells Like Teen Spirit", a: "Nirvana" },
+      { t: "Stand By Me", a: "Ben E. King" },
+      { t: "Streets of Love", a: "Rolling Stones" },
+      { t: "Sunday Morning", a: "Maroon 5" },
+      { t: "Sweet Home Alabama", a: "Lynyrd Skynyrd" },
+      { t: "Sweet Home Chicago", a: "The Blues Brothers" },
+      { t: "Take Me Home, Country Roads", a: "John Denver" },
+      { t: "Talkin' About Revolution", a: "Tracy Chapman" },
+      { t: "The Passenger", a: "Iggy Pop" },
+      { t: "Thunderstruck", a: "AC/DC" },
+      { t: "Vita Spericolata", a: "Vasco Rossi" },
+      { t: "What's Up", a: "4 Non Blondes" },
+      { t: "While My Guitar Gently Weeps", a: "The Beatles" },
+      { t: "Whole Lotta Love", a: "Led Zeppelin" },
+      { t: "Why Don’t You Do Right", a: "Peggy Lee" },
+      { t: "Wonderwall", a: "Oasis" },
+      { t: "You Never Can Tell", a: "Chuck Berry" }
     ];
 
-    window.renderBrani = (arrayBrani) => {
-      listContainer.innerHTML = '';
-      if(arrayBrani.length === 0) {
-        listContainer.innerHTML = '<p style="color: var(--subtext); text-align: center;">No songs found.</p>';
+    const COOLDOWN_MS = 10 * 60 * 1000; // 10 Minutes
+    const listContainer = document.getElementById('song-list');
+    const upcomingContainer = document.getElementById('upcoming-list');
+    const searchBar = document.getElementById('searchBar');
+    const timerBanner = document.getElementById('timerBanner');
+    const concertEndBanner = document.getElementById('concertEndBanner');
+    const countdownEl = document.getElementById('countdown');
+    const nameInputContainer = document.getElementById('nameInputContainer');
+    const nameDisplayContainer = document.getElementById('nameDisplayContainer');
+    const userNameInput = document.getElementById('userName');
+    const displayNameSpan = document.getElementById('displayName');
+    let timerInterval = null;
+    let concertClosed = false;
+
+    // Handle name saving on startup
+    const savedName = localStorage.getItem('dual_shock_user_name');
+    if (savedName) {
+      userNameInput.value = savedName;
+      displayNameSpan.innerText = savedName;
+      nameInputContainer.style.display = 'none';
+      nameDisplayContainer.style.display = 'flex';
+    }
+
+    window.salvaNome = () => {
+      const name = userNameInput.value.trim();
+      if (!name) {
+        alert('Please enter a valid name!');
         return;
       }
-      arrayBrani.forEach((b) => {
+      localStorage.setItem('dual_shock_user_name', name);
+      displayNameSpan.innerText = name;
+      nameInputContainer.style.display = 'none';
+      nameDisplayContainer.style.display = 'flex';
+    };
+
+    window.abilitaModificaNome = () => {
+      nameInputContainer.style.display = 'block';
+      nameDisplayContainer.style.display = 'none';
+      userNameInput.focus();
+    };
+
+    // Listen to upcoming shows in real-time from Firebase (supports both separated and legacy fields)
+    onValue(ref(db, 'prossimi_live'), (snapshot) => {
+      const data = snapshot.val();
+      upcomingContainer.innerHTML = '';
+      if (!data) {
+        upcomingContainer.innerHTML = '<p style="text-align: center; color: var(--subtext); font-size: 0.9em; padding: 10px 0;">No upcoming shows scheduled at the moment.</p>';
+        return;
+      }
+      Object.keys(data).forEach(key => {
+        const item = data[key];
+        const div = document.createElement('div');
+        div.className = 'upcoming-item';
+        const locationText = item.city ? `${item.venue} (${item.city})` : item.venue;
+        div.innerHTML = `
+          <span class="upcoming-date">📅 ${item.date}</span>
+          <span class="upcoming-venue">📍 ${locationText}</span>
+        `;
+        upcomingContainer.appendChild(div);
+      });
+    });
+
+    // Function to render the song list with search support
+    function renderSongs(filter = '') {
+      listContainer.innerHTML = '';
+      const query = filter.toLowerCase().trim();
+      
+      const filtered = brani.filter(b => 
+        b.t.toLowerCase().includes(query) || b.a.toLowerCase().includes(query)
+      );
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = '<p style="text-align: center; color: var(--subtext); padding: 15px;">No songs found...</p>';
+        return;
+      }
+
+      filtered.forEach((b) => {
         const item = document.createElement('div');
         item.className = 'song-item';
         item.innerHTML = `
@@ -287,120 +331,91 @@
         `;
         listContainer.appendChild(item);
       });
-    };
 
-    window.filtraBrani = () => {
-      const query = document.getElementById('searchSong').value.toLowerCase();
-      const filtrati = brani.filter(b => b.t.toLowerCase().includes(query) || b.a.toLowerCase().includes(query));
-      renderBrani(filtrati);
-    };
-
-    renderBrani(brani);
-
-    window.salvaNome = () => {
-      const name = document.getElementById('userName').value.trim();
-      if(!name) {
-        alert('Please enter a valid name!');
-        return;
-      }
-      localStorage.setItem('dual_shock_username', name);
-      mostraNomeSalvato(name);
-    };
-
-    window.cambiaNome = () => {
-      localStorage.removeItem('dual_shock_username');
-      document.getElementById('nameSection').style.display = 'block';
-      document.getElementById('savedNameSection').style.display = 'none';
-      document.getElementById('userName').value = '';
-    };
-
-    function mostraNomeSalvato(name) {
-      document.getElementById('displayName').innerText = name;
-      document.getElementById('nameSection').style.display = 'none';
-      document.getElementById('savedNameSection').style.display = 'flex';
-    }
-
-    const savedName = localStorage.getItem('dual_shock_username');
-    if(savedName) {
-      mostraNomeSalvato(savedName);
-    }
-
-    onValue(ref(db, 'concerto_chiuso'), (snapshot) => {
-      concertoChiuso = snapshot.val() === true;
-      if(concertoChiuso) {
-        concertoBanner.style.display = 'block';
+      if (concertClosed) {
+        setButtonsDisabled(true);
       } else {
-        concertoBanner.style.display = 'none';
+        updateTimer();
       }
+    }
+
+    searchBar.addEventListener('input', (e) => {
+      renderSongs(e.target.value);
     });
 
-    onValue(ref(db, 'prossimi_live'), (snapshot) => {
-      const data = snapshot.val();
-      showsContainer.innerHTML = '';
-      if(!data) {
-        showsContainer.innerHTML = '<p style="color: var(--subtext); font-size: 0.9em;">No upcoming shows scheduled at the moment.</p>';
-        return;
+    onValue(ref(db, 'concerto_chiuso'), (snapshot) => {
+      concertClosed = snapshot.val() === true;
+      if (concertClosed) {
+        concertEndBanner.style.display = 'block';
+        timerBanner.style.display = 'none';
+        setButtonsDisabled(true);
+      } else {
+        concertEndBanner.style.display = 'none';
+        updateTimer();
       }
-      Object.keys(data).forEach(key => {
-        const show = data[key];
-        const div = document.createElement('div');
-        div.className = 'show-item';
-        div.innerHTML = `
-          <div class="show-date">📅 ${show.data}</div>
-          <div>📍 <strong>${show.locale}</strong> - ${show.citta}</div>
-        `;
-        showsContainer.appendChild(div);
-      });
     });
 
     function updateTimer() {
+      if (concertClosed) return;
+
       const lastRequest = localStorage.getItem('last_song_request_time');
       if (!lastRequest) {
         timerBanner.style.display = 'none';
+        setButtonsDisabled(false);
         return;
       }
-      const elapsed = Date.now() - parseInt(lastRequest, 10);
-      const remaining = COOLDOWN_MS - elapsed;
 
-      if (remaining <= 0) {
-        timerBanner.style.display = 'none';
-        localStorage.removeItem('last_song_request_time');
-        clearInterval(timerInterval);
-      } else {
+      const now = Date.now();
+      const diff = now - parseInt(lastRequest, 10);
+
+      if (diff < COOLDOWN_MS) {
+        const remaining = COOLDOWN_MS - diff;
+        const min = Math.floor(remaining / 60000);
+        const sec = Math.floor((remaining % 60000) / 1000);
+
+        countdownEl.innerText = `${min}:${sec < 10 ? '0' : ''}${sec}`;
         timerBanner.style.display = 'block';
-        const minutes = Math.floor(remaining / 60000);
-        const seconds = Math.floor((remaining % 60000) / 1000);
-        countdownEl.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        setButtonsDisabled(true);
+      } else {
+        timerBanner.style.display = 'none';
+        setButtonsDisabled(false);
+        clearInterval(timerInterval);
       }
     }
 
-    if (localStorage.getItem('last_song_request_time')) {
-      updateTimer();
-      timerInterval = setInterval(updateTimer, 1000);
+    function setButtonsDisabled(disabled) {
+      const buttons = document.querySelectorAll('.select-btn');
+      buttons.forEach(btn => btn.disabled = disabled);
     }
+
+    renderSongs();
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 1000);
 
     window.seleziona = (titolo, artista) => {
-      if(concertoChiuso) {
-        alert('⚠️ The concert has ended, new requests are not allowed.');
+      if (concertClosed) {
+        alert('⚠️ The concert is ending or has finished, new requests cannot be sent.');
         return;
       }
 
-      const name = localStorage.getItem('dual_shock_username') || document.getElementById('userName').value.trim();
+      let name = localStorage.getItem('dual_shock_user_name') || userNameInput.value.trim();
       if(!name) {
         alert('Please enter your name at the top before picking a song!');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
 
+      localStorage.setItem('dual_shock_user_name', name);
+
       const lastRequest = localStorage.getItem('last_song_request_time');
       if (lastRequest && (Date.now() - parseInt(lastRequest, 10) < COOLDOWN_MS)) {
-        alert('⏳ You already sent a request! Wait for the timer at the top.');
+        alert('⏳ You have already sent a request! Please wait for the timer above to expire.');
         return;
       }
 
       const dedica = document.getElementById('dedica').value.trim();
       const now = Date.now();
-
+      
       push(ref(db, 'richiesta_live'), {
         name: name,
         song: titolo + " - " + artista,
@@ -413,7 +428,7 @@
         updateTimer();
         timerInterval = setInterval(updateTimer, 1000);
       }).catch(err => {
-        alert('Error sending request: ' + err.message);
+        alert('Error sending: ' + err.message);
       });
     };
   </script>
