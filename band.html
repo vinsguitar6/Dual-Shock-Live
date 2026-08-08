@@ -3,399 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dual Shock - Dashboard Palco</title>
-
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- Firebase Web SDK v9 (Compat) -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-
+  <title>Dashboard Palco - Dual Shock</title>
   <style>
-    :root {
-      --bg-dark: #05070e;
-      --card-bg: #111827;
-      --accent-green: #10b981;
-      --accent-red: #ef4444;
-      --accent-gold: #f59e0b;
-      --accent-cyan: #06b6d4;
-      --text-main: #f9fafb;
-      --text-sub: #9ca3af;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
-
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      padding: 20px;
-      min-height: 100vh;
-    }
-
-    .header-band {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--card-bg);
-      padding: 16px 24px;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      margin-bottom: 20px;
-    }
-
-    .status-toggle {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 60px;
-      height: 34px;
-    }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider {
-      position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #374151; transition: .3s; border-radius: 34px;
-    }
-    .slider:before {
-      position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px;
-      background-color: white; transition: .3s; border-radius: 50%;
-    }
-    input:checked + .slider { background-color: var(--accent-green); }
-    input:checked + .slider:before { transform: translateX(26px); }
-
-    .grid-container {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 20px;
-    }
-
-    @media (max-width: 900px) {
-      .grid-container { grid-template-columns: 1fr; }
-    }
-
-    .panel {
-      background: var(--card-bg);
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 20px;
-    }
-
-    .panel h2 {
-      font-size: 1.2rem;
-      color: var(--accent-cyan);
-      margin-bottom: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    /* Lista Richieste Live */
-    .requests-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      transition: opacity 0.3s ease;
-    }
-
-    .req-card {
-      background: rgba(31, 41, 55, 0.6);
-      border-left: 4px solid var(--accent-cyan);
-      padding: 14px 16px;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .req-info h3 { font-size: 1.1rem; color: #fff; }
-    .req-info p { font-size: 0.85rem; color: var(--text-sub); margin-top: 2px; }
-    .req-meta { text-align: right; }
-    .req-user { font-size: 0.9rem; font-weight: 600; color: var(--accent-gold); }
-    .req-badge { font-size: 0.75rem; color: #d1d5db; display: block; margin-top: 2px; }
-
-    .btn-action {
-      background: rgba(239, 68, 68, 0.2);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-      color: var(--accent-red);
-      padding: 6px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.8rem;
-    }
-
-    /* Input Date Live */
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .form-group input {
-      padding: 10px 14px;
-      background: #1f2937;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      color: #fff;
-    }
-    .btn-add {
-      background: var(--accent-cyan);
-      color: #000;
-      border: none;
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .date-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
+    :root { --bg: #121212; --card: #1e1e1e; --primary: #ff9800; --text: #ffffff; --subtext: #aaa; --danger: #f44336; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
+    h1 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+    .card { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; justify-content: space-between; align-items: center; }
+    .req-info { display: flex; flex-direction: column; gap: 4px; }
+    .req-song { font-size: 1.1em; font-weight: bold; color: var(--primary); }
+    .req-user { font-weight: bold; font-size: 0.95em; }
+    .req-msg { font-style: italic; color: #4caf50; font-size: 0.9em; }
+    .btn-done { background: #333; color: #fff; border: 1px solid #555; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
+    .btn-clear-all { background: var(--danger); color: #fff; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 20px; }
+    .empty-msg { text-align: center; color: var(--subtext); margin-top: 40px; font-size: 1.1em; }
   </style>
 </head>
 <body>
 
-  <!-- Header Dashboard -->
-  <div class="header-band">
-    <div>
-      <h1 style="font-size: 1.6rem; color: #fff;">🎸 DUAL SHOCK - Stage Control</h1>
-      <p style="color: var(--text-sub); font-size: 0.85rem;">Dashboard per la gestione delle richieste live e delle date</p>
-    </div>
+  <h1>📡 Richieste Live in Tempo Reale</h1>
+  
+  <button class="btn-clear-all" onclick="svuotaTutto()">🗑️ Azzera tutte le richieste (Fine Serata)</button>
 
-    <div class="status-toggle">
-      <span style="font-weight: 600;" id="statusLabel">STATO SHOW: OFFLINE</span>
-      <label class="switch">
-        <input type="checkbox" id="toggleState" onchange="toggleConcertState(this.checked)">
-        <span class="slider"></span>
-      </label>
-    </div>
+  <div id="requests-container">
+    <p class="empty-msg">Nessuna richiesta al momento...</p>
   </div>
 
-  <div class="grid-container">
-    <!-- Pannello Richieste In Tempo Reale -->
-    <div class="panel">
-      <h2>
-        <span>🎵 Richieste dal Pubblico</span>
-        <button class="btn-action" onclick="clearAllRequests()">Svuota Tutte</button>
-      </h2>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-      <div class="requests-list" id="requestsContainer">
-        <p style="color: var(--text-sub); font-size: 0.9rem;">In attesa di nuove richieste...</p>
-      </div>
-    </div>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDqH7id1aRXulq9CfVjLn9TDu4QYX9Paao",
+      authDomain: "dual-shock-live.firebaseapp.com",
+      databaseURL: "https://dual-shock-live-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "dual-shock-live",
+      storageBucket: "dual-shock-live.firebasestorage.app",
+      messagingSenderId: "231528691879",
+      appId: "1:231528691879:web:1e0fdcea4a8f17815e0382"
+    };
 
-    <!-- Pannello Gestione Date Concerti -->
-    <div class="panel">
-      <h2>📅 Gestione Prossime Date</h2>
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-      <div class="form-group">
-        <input type="text" id="dateInput" placeholder="Data (es. 25 Agosto)">
-        <input type="text" id="venueInput" placeholder="Locale / Pub (es. Retrogusto)">
-        <input type="text" id="cityInput" placeholder="Città (es. Bolsena)">
-        <button class="btn-add" onclick="addDate()">+ Aggiungi Data Live</button>
-      </div>
+    const container = document.getElementById('requests-container');
 
-      <h3 style="font-size: 0.9rem; color: var(--text-sub); margin-bottom: 10px;">Date Salvate:</h3>
-      <div id="datesContainer"></div>
-    </div>
-  </div>
-
-<script>
-  // SOSTITUISCI CON LE TUE CREDENZIALI REALI DI FIREBASE
-  const firebaseConfig = {
-    apiKey: "TUO_API_KEY",
-    authDomain: "TUO_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://TUO_PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId: "TUO_PROJECT_ID",
-    storageBucket: "TUO_PROJECT_ID.appspot.com",
-    messagingSenderId: "TUO_SENDER_ID",
-    appId: "TUO_APP_ID"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-  // Helper per la sicurezza dell'HTML (evita attacchi XSS dai testi utente)
-  function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;');
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    listenConcertState();
-    listenRequests();
-    listenDates();
-  });
-
-  // GESTIONE STATO CONCERTO
-  function listenConcertState() {
-    db.ref('stato_concerto').on('value', (snap) => {
-      const val = snap.val();
-      
-      // Riconosce sia booleani true/false che stringhe "online", "true", "on"
-      const isOnline = (val === true) || 
-                       (typeof val === 'string' && ['online', 'true', 'on'].includes(val.trim().toLowerCase()));
-
-      document.getElementById('toggleState').checked = isOnline;
-      const label = document.getElementById('statusLabel');
-      label.innerText = isOnline ? "STATO SHOW: ONLINE 🟢" : "STATO SHOW: OFFLINE 🔴";
-      label.style.color = isOnline ? "#10b981" : "#ef4444";
-
-      // Trasparenza per segnalare che lo show è offline
-      const container = document.getElementById('requestsContainer');
-      if (container) {
-        container.style.opacity = isOnline ? '1' : '0.5';
-      }
-    }, (error) => {
-      console.error("Errore lettura stato concerto:", error);
-    });
-  }
-
-  function toggleConcertState(val) {
-    db.ref('stato_concerto').set(val).catch(err => {
-      alert("Errore nell'aggiornamento dello stato dello show: " + err.message);
-    });
-  }
-
-  // ASCOLTO E RENDERING RICHIESTE
-  function listenRequests() {
-    db.ref('richieste').on('value', (snap) => {
-      const data = snap.val();
-      const container = document.getElementById('requestsContainer');
+    onValue(ref(db, 'richiesta_live'), (snapshot) => {
+      const data = snapshot.val();
       container.innerHTML = '';
 
-      if (!data) {
-        container.innerHTML = '<p style="color: var(--text-sub); font-size: 0.9rem;">Nessuna richiesta al momento.</p>';
+      if(!data) {
+        container.innerHTML = '<p class="empty-msg">Nessuna richiesta al momento...</p>';
         return;
       }
 
-      const reqKeys = Object.keys(data).reverse();
-
-      reqKeys.forEach(key => {
-        const req = data[key];
-        
-        // Sanificazione dei testi di input utente
-        const titolo = escapeHtml(req.titolo || 'Senza titolo');
-        const artista = escapeHtml(req.artista || 'Artista sconosciuto');
-        const dedica = escapeHtml(req.dedica);
-        const utente = escapeHtml(req.utente || 'Anonimo');
-        const livello = escapeHtml(req.livello || '🎧 Spettatore');
-        const orario = escapeHtml(req.orario || '');
-
-        const div = document.createElement('div');
-        div.className = 'req-card';
-        div.innerHTML = `
+      Object.keys(data).forEach(key => {
+        const item = data[key];
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
           <div class="req-info">
-            <h3>${titolo} <span style="font-weight:400; font-size:0.85rem; color:var(--text-sub);">(${artista})</span></h3>
-            ${dedica ? `<p style="color:var(--accent-gold);">💬 "${dedica}"</p>` : ''}
-            <p style="font-size:0.75rem;">⏰ ${orario}</p>
+            <span class="req-song">🎵 ${item.song}</span>
+            <span class="req-user">👤 Da: ${item.name}</span>
+            ${item.message ? `<span class="req-msg">💬 "${item.message}"</span>` : ''}
           </div>
-          <div class="req-meta">
-            <span class="req-user">👤 ${utente}</span>
-            <span class="req-badge">${livello}</span>
-            <button class="btn-action" style="margin-top:6px;" onclick="deleteRequest('${key}')">Fatto ✓</button>
-          </div>
+          <button class="btn-done" onclick="rimuovi('${key}')">✓ Fatta</button>
         `;
-        container.appendChild(div);
+        container.appendChild(card);
       });
-    }, (error) => {
-      console.error("Errore lettura richieste:", error);
     });
-  }
 
-  function deleteRequest(key) {
-    db.ref(`richieste/${key}`).remove().catch(err => {
-      alert("Errore nell'eliminazione della richiesta: " + err.message);
-    });
-  }
+    window.rimuovi = (key) => {
+      remove(ref(db, 'richiesta_live/' + key));
+    };
 
-  function clearAllRequests() {
-    if (confirm("Vuoi cancellare tutte le richieste presenti sulla dashboard?")) {
-      db.ref('richieste').remove().catch(err => {
-        alert("Errore durante lo svuotamento: " + err.message);
-      });
-    }
-  }
-
-  // GESTIONE PROSSIME DATE
-  function listenDates() {
-    db.ref('prossime_date').on('value', (snap) => {
-      const dates = snap.val();
-      const container = document.getElementById('datesContainer');
-      container.innerHTML = '';
-
-      if (!dates) {
-        container.innerHTML = '<p style="font-size:0.85rem; color:var(--text-sub);">Nessuna data futura inserita.</p>';
-        return;
+    window.svuotaTutto = () => {
+      if(confirm('Vuoi davvero cancellare tutte le richieste arrivate stasera?')) {
+        remove(ref(db, 'richiesta_live'));
       }
-
-      Object.keys(dates).forEach(key => {
-        const d = dates[key];
-        const dataText = escapeHtml(d.data);
-        const localeText = escapeHtml(d.locale);
-        const cittaText = escapeHtml(d.citta);
-
-        const div = document.createElement('div');
-        div.className = 'date-row';
-        div.innerHTML = `
-          <div style="font-size:0.85rem;">
-            <strong>${dataText}</strong> - ${localeText} (${cittaText})
-          </div>
-          <button class="btn-action" onclick="deleteDate('${key}')">✕</button>
-        `;
-        container.appendChild(div);
-      });
-    }, (error) => {
-      console.error("Errore lettura date:", error);
-    });
-  }
-
-  function addDate() {
-    const dataVal = document.getElementById('dateInput').value.trim();
-    const localeVal = document.getElementById('venueInput').value.trim();
-    const cittaVal = document.getElementById('cityInput').value.trim();
-
-    if (!dataVal || !localeVal) {
-      alert("Inserisci almeno la data e il nome del locale!");
-      return;
-    }
-
-    db.ref('prossime_date').push({
-      data: dataVal,
-      locale: localeVal,
-      citta: cittaVal || 'Viterbo e prov.'
-    }).then(() => {
-      document.getElementById('dateInput').value = '';
-      document.getElementById('venueInput').value = '';
-      document.getElementById('cityInput').value = '';
-    }).catch((error) => {
-      console.error("Errore nell'inserimento della data:", error);
-      alert("Impossibile salvare la data: " + error.message);
-    });
-  }
-
-  function deleteDate(key) {
-    db.ref(`prossime_date/${key}`).remove().catch(err => {
-      alert("Errore nella rimozione della data: " + err.message);
-    });
-  }
-</script>
-
+    };
+  </script>
 </body>
 </html>
