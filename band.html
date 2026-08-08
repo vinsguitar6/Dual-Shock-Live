@@ -130,7 +130,7 @@
       remove(ref(db, 'richiesta_live/' + key));
     };
 
-    // 3. Ascolto Proposte Prossimi Live
+    // 3. Ascolto Proposte Prossimi Live (con contatore voti)
     onValue(ref(db, 'proposte_brani'), (snapshot) => {
       const list = document.getElementById('proposte-list');
       const countEl = document.getElementById('countProposte');
@@ -144,18 +144,20 @@
       }
 
       let count = 0;
-      Object.keys(data).reverse().forEach(key => {
-        const item = data[key];
+      const proposteArray = Object.keys(data).map(key => ({ key, ...data[key] }));
+      proposteArray.sort((a, b) => (b.voti || 1) - (a.voti || 1));
+
+      proposteArray.forEach(item => {
         if (item.stato !== 'archiviato') {
           count++;
           const div = document.createElement('div');
           div.className = 'req-item';
           div.innerHTML = `
             <div class="req-info">
-              <span class="req-song">${item.song}</span>
+              <span class="req-song">${item.song} <span style="color: var(--primary); font-size: 0.9em;">(🔥 ${item.voti || 1} ${item.voti > 1 ? 'richieste' : 'richiesta'})</span></span>
               <span class="req-user">🎤 Artista: ${item.artist}</span>
             </div>
-            <button class="btn-action btn-archive" onclick="archiviaProposta('${key}')">✅ Segna come Studiato</button>
+            <button class="btn-action btn-archive" onclick="archiviaProposta('${item.key}')">✅ Segna come Studiato</button>
           `;
           list.appendChild(div);
         }
