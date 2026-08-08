@@ -118,6 +118,8 @@
 
   <div class="section">
     <h2>Song List</h2>
+    <!-- SEARCH BAR -->
+    <input type="text" id="searchBar" placeholder="🔍 Search by song or artist..." style="margin-bottom: 15px;">
     <div id="song-list"></div>
   </div>
 
@@ -229,6 +231,7 @@
 
     const COOLDOWN_MS = 10 * 60 * 1000; // 10 Minutes
     const listContainer = document.getElementById('song-list');
+    const searchBar = document.getElementById('searchBar');
     const timerBanner = document.getElementById('timerBanner');
     const concertEndBanner = document.getElementById('concertEndBanner');
     const countdownEl = document.getElementById('countdown');
@@ -266,17 +269,43 @@
       userNameInput.focus();
     };
 
-    brani.forEach((b) => {
-      const item = document.createElement('div');
-      item.className = 'song-item';
-      item.innerHTML = `
-        <div class="song-info">
-          <span class="song-title">${b.t}</span>
-          <span class="song-artist">${b.a}</span>
-        </div>
-        <button class="select-btn" onclick="seleziona('${b.t.replace(/'/g, "\\'")}', '${b.a.replace(/'/g, "\\'")}')">Pick</button>
-      `;
-      listContainer.appendChild(item);
+    // Render songs function with search filtering
+    function renderSongs(filter = '') {
+      listContainer.innerHTML = '';
+      const query = filter.toLowerCase().trim();
+      
+      const filtered = brani.filter(b => 
+        b.t.toLowerCase().includes(query) || b.a.toLowerCase().includes(query)
+      );
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = '<p style="text-align: center; color: var(--subtext); padding: 15px;">No songs found...</p>';
+        return;
+      }
+
+      filtered.forEach((b) => {
+        const item = document.createElement('div');
+        item.className = 'song-item';
+        item.innerHTML = `
+          <div class="song-info">
+            <span class="song-title">${b.t}</span>
+            <span class="song-artist">${b.a}</span>
+          </div>
+          <button class="select-btn" onclick="seleziona('${b.t.replace(/'/g, "\\'")}', '${b.a.replace(/'/g, "\\'")}')">Pick</button>
+        `;
+        listContainer.appendChild(item);
+      });
+
+      if (concertClosed) {
+        setButtonsDisabled(true);
+      } else {
+        updateTimer();
+      }
+    }
+
+    // Listen to search bar input
+    searchBar.addEventListener('input', (e) => {
+      renderSongs(e.target.value);
     });
 
     // Listen to concert status in real-time
@@ -325,6 +354,8 @@
       buttons.forEach(btn => btn.disabled = disabled);
     }
 
+    // Initialize song list
+    renderSongs();
     updateTimer();
     timerInterval = setInterval(updateTimer, 1000);
 
