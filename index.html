@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Tag Anti-Cache per forzare l'aggiornamento immediato -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  
   <title>Scegli il brano dal vivo - Dual Shock</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -398,7 +403,7 @@
       { t: "You Never Can Tell", a: "Chuck Berry" }
     ];
 
-    const COOLDOWN_MS = 10 * 60 * 1000; // 10 Minuti
+    const COOLDOWN_MS = 10 * 60 * 1000;
     const listContainer = document.getElementById('song-list');
     const timerBanner = document.getElementById('timerBanner');
     const countdownEl = document.getElementById('countdown');
