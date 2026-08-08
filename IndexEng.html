@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dual Shock Live - Song Request</title>
+  <title>Dual Shock Live - Request a Song</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,7 +26,12 @@
       --text-sub: #94a3b8;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', sans-serif;
+    }
 
     body {
       background: var(--bg-dark);
@@ -40,18 +45,31 @@
       padding-bottom: 90px;
     }
 
-    .container { max-width: 600px; margin: 0 auto; }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
 
-    header { text-align: center; padding: 20px 0 15px; }
+    /* Header */
+    header {
+      text-align: center;
+      padding: 20px 0 15px;
+    }
     header h1 {
       font-size: 2.2rem;
       font-weight: 800;
       background: linear-gradient(135deg, #00f2fe, #4facfe);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
     }
-    header p { color: var(--text-sub); font-size: 0.95rem; margin-top: 4px; }
+    header p {
+      color: var(--text-sub);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
 
+    /* Common Card */
     .card {
       background: var(--card-bg);
       backdrop-filter: blur(12px);
@@ -63,6 +81,7 @@
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     }
 
+    /* User Profile / Gamification */
     .user-profile {
       display: flex;
       align-items: center;
@@ -71,10 +90,24 @@
       background: linear-gradient(135deg, rgba(79, 172, 254, 0.15), rgba(0, 242, 254, 0.05));
       border: 1px solid rgba(0, 242, 254, 0.2);
     }
-    .user-info { display: flex; flex-direction: column; }
-    .user-name { font-size: 1.1rem; font-weight: 600; color: #fff; }
-    .user-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.85rem; color: var(--accent-gold); font-weight: 600; margin-top: 2px; }
-
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .user-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+    .user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.85rem;
+      color: var(--accent-gold);
+      font-weight: 600;
+      margin-top: 2px;
+    }
     .btn-small {
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.15);
@@ -83,45 +116,165 @@
       border-radius: 8px;
       font-size: 0.8rem;
       cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-small:hover {
+      background: rgba(255, 255, 255, 0.2);
     }
 
-    .name-setup { display: flex; flex-direction: column; gap: 10px; }
+    /* Name Setup Form */
+    .name-setup {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
     .name-setup input, .search-bar input, .dedica-input {
-      width: 100%; padding: 12px 16px; background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 10px; color: #fff; font-size: 0.95rem; outline: none;
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .name-setup input:focus, .search-bar input:focus, .dedica-input:focus {
+      border-color: var(--accent-cyan);
     }
 
     .btn-primary {
       background: linear-gradient(135deg, #00f2fe, #4facfe);
-      border: none; color: #000; font-weight: 700; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-size: 0.95rem;
+      border: none;
+      color: #000;
+      font-weight: 700;
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: transform 0.1s ease, opacity 0.2s ease;
+    }
+    .btn-primary:active {
+      transform: scale(0.98);
     }
 
-    .offline-banner { text-align: center; padding: 24px; }
-    .offline-banner h2 { font-size: 1.5rem; color: var(--accent-gold); margin-bottom: 8px; }
-
+    /* Offline Banner & Dates */
+    .offline-banner {
+      text-align: center;
+      padding: 24px;
+    }
+    .offline-banner h2 {
+      font-size: 1.5rem;
+      color: var(--accent-gold);
+      margin-bottom: 8px;
+    }
     .next-date-highlight {
-      background: rgba(255, 183, 3, 0.1); border: 1px solid rgba(255, 183, 3, 0.3);
-      border-radius: 12px; padding: 14px; margin: 16px 0; text-align: left;
+      background: rgba(255, 183, 3, 0.1);
+      border: 1px solid rgba(255, 183, 3, 0.3);
+      border-radius: 12px;
+      padding: 14px;
+      margin: 16px 0;
+      text-align: left;
     }
-    .next-date-highlight h3 { font-size: 0.85rem; text-transform: uppercase; color: var(--accent-gold); margin-bottom: 6px; }
+    .next-date-highlight h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-gold);
+      margin-bottom: 6px;
+    }
+    .date-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .date-item:last-child {
+      border-bottom: none;
+    }
 
-    .date-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-    .search-bar { margin-bottom: 14px; }
-    .song-list { display: flex; flex-direction: column; gap: 10px; max-height: 520px; overflow-y: auto; }
+    /* Song List & Search */
+    .search-bar {
+      margin-bottom: 14px;
+    }
+    .song-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 520px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
     .song-card {
-      display: flex; justify-content: space-between; align-items: center;
-      background: rgba(15, 23, 42, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 12px 14px;
+      transition: background 0.2s;
+    }
+    .song-card:hover {
+      background: rgba(15, 23, 42, 0.7);
+    }
+    .song-info h4 {
+      font-size: 1rem;
+      color: #fff;
+    }
+    .song-info p {
+      font-size: 0.85rem;
+      color: var(--text-sub);
     }
 
-    .tip-jar { text-align: center; margin-top: 25px; padding: 16px; background: rgba(255, 255, 255, 0.03); border-radius: 14px; border: 1px dashed rgba(255, 255, 255, 0.15); }
-    .tip-btn { display: inline-block; margin-top: 10px; background: #0070ba; color: #fff; text-decoration: none; font-weight: 600; padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; }
+    /* Dedication Box */
+    .dedica-box {
+      margin-top: 8px;
+      display: flex;
+      gap: 8px;
+    }
 
+    /* Tip Jar PayPal */
+    .tip-jar {
+      text-align: center;
+      margin-top: 25px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 14px;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+    }
+    .tip-btn {
+      display: inline-block;
+      margin-top: 10px;
+      background: #0070ba;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px rgba(0, 112, 186, 0.3);
+    }
+
+    /* Animated Level Up Pop-up */
     .levelup-modal {
-      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
-      background: #111827; border: 2px solid var(--accent-gold); padding: 24px; border-radius: 20px; text-align: center; z-index: 999; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: #111827;
+      border: 2px solid var(--accent-gold);
+      box-shadow: 0 0 30px rgba(255, 183, 3, 0.4);
+      padding: 24px;
+      border-radius: 20px;
+      text-align: center;
+      z-index: 999;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
-    .levelup-modal.active { transform: translate(-50%, -50%) scale(1); }
+    .levelup-modal.active {
+      transform: translate(-50%, -50%) scale(1);
+    }
   </style>
 </head>
 <body>
@@ -132,76 +285,82 @@
     <p>Acoustic Duo • Live Experience</p>
   </header>
 
-  <!-- Name Entry Card -->
+  <!-- Name Setup Box -->
   <div id="nameCard" class="card name-setup" style="display: none;">
     <h3>Welcome! Enter your name</h3>
-    <p style="font-size: 0.85rem; color: var(--text-sub);">It allows us to shout you out from the stage when requesting songs!</p>
+    <p style="font-size: 0.85rem; color: var(--text-sub);">It lets us give you a shoutout from the stage when you request a song!</p>
     <input type="text" id="inputUserName" placeholder="Your name or nickname...">
     <button class="btn-primary" onclick="saveName()">Join the Live 🎸</button>
   </div>
 
-  <!-- User Profile Card -->
+  <!-- User Profile (If registered) -->
   <div id="profileCard" class="card user-profile" style="display: none;">
     <div class="user-info">
       <span class="user-name" id="displayUserName">Name</span>
-      <span class="user-badge" id="displayUserBadge">🎧 Tuned Listener</span>
+      <span class="user-badge" id="displayUserBadge">🎧 Tuned Spectator</span>
     </div>
     <button class="btn-small" onclick="resetName()">✏️ Edit</button>
   </div>
 
-  <!-- OFFLINE Section -->
+  <!-- OFFLINE Screen -->
   <div id="offlineSection" class="card offline-banner" style="display: none;">
     <h2>🔴 The show is currently offline</h2>
-    <p style="color: var(--text-sub);">The concert hasn't started yet or has finished.</p>
+    <p style="color: var(--text-sub);">The concert hasn't started yet or has just finished.</p>
 
+    <!-- Next Show Highlight -->
     <div id="nextDateHighlight" class="next-date-highlight" style="display: none;">
-      <h3>📌 Upcoming Show</h3>
+      <h3>📌 Next Scheduled Concert</h3>
       <div id="nextDateContent"></div>
     </div>
 
+    <!-- All Upcoming Dates List -->
     <div style="text-align: left; margin-top: 15px;">
-      <h4 style="font-size: 0.95rem; margin-bottom: 10px; color: var(--accent-cyan);">📅 Upcoming Tour Dates</h4>
+      <h4 style="font-size: 0.95rem; margin-bottom: 10px; color: var(--accent-cyan);">📅 Upcoming Live Calendar</h4>
       <div id="publicDatesList">
-        <p style="font-size: 0.85rem; color: var(--text-sub);">No upcoming dates scheduled at the moment.</p>
+        <p style="font-size: 0.85rem; color: var(--text-sub);">No upcoming shows listed at the moment.</p>
       </div>
     </div>
 
+    <!-- Song Recommendation Form for Future Shows -->
     <div style="margin-top: 20px; text-align: left; background: rgba(0, 0, 0, 0.2); padding: 14px; border-radius: 12px;">
-      <h4 style="font-size: 0.9rem; color: #fff; margin-bottom: 6px;">💡 Suggest a song for future shows</h4>
-      <input type="text" id="offSongTitle" class="dedica-input" placeholder="Song title & artist..." style="margin-bottom: 8px;">
+      <h4 style="font-size: 0.9rem; color: #fff; margin-bottom: 6px;">💡 Suggest a song for our upcoming shows</h4>
+      <input type="text" id="offSongTitle" class="dedica-input" placeholder="Song title and artist..." style="margin-bottom: 8px;">
       <button class="btn-primary" style="width: 100%;" onclick="submitOfflineSong()">Send Suggestion</button>
     </div>
   </div>
 
-  <!-- ONLINE Section -->
+  <!-- ONLINE Screen (Song Request) -->
   <div id="onlineSection" class="card" style="display: none;">
     <div class="search-bar">
       <input type="text" id="searchSong" placeholder="🔍 Search song or artist..." oninput="filterSongs()">
     </div>
 
     <div style="margin-bottom: 12px;">
-      <input type="text" id="dedicaText" class="dedica-input" placeholder="💬 Add an optional shoutout/dedication...">
+      <input type="text" id="dedicaText" class="dedica-input" placeholder="💬 Add an optional shoutout/dedication (e.g., For Sarah!)...">
     </div>
 
-    <div class="song-list" id="songList"></div>
+    <div class="song-list" id="songList">
+      <!-- Generated dynamically via JS -->
+    </div>
   </div>
 
-  <!-- Tip Jar PayPal -->
+  <!-- Tip Jar / PayPal -->
   <div class="tip-jar">
-    <p style="font-size: 0.9rem; color: var(--text-main);">🍻 Enjoying the concert? Buy us a beer!</p>
-    <a class="tip-btn" href="https://www.paypal.me/oblyvion" target="_blank">Tip via PayPal 💳</a>
+    <p style="font-size: 0.9rem; color: var(--text-main);">🍻 Enjoying the concert? Buy us a drink!</p>
+    <a class="tip-btn" href="https://www.paypal.me/oblyvion" target="_blank">Tip us on PayPal 💳</a>
   </div>
 </div>
 
 <!-- Level Up Modal -->
 <div id="levelModal" class="levelup-modal">
   <h2 style="color: var(--accent-gold); font-size: 1.8rem; margin-bottom: 6px;">🎉 LEVEL UP!</h2>
-  <p style="font-size: 0.9rem; color: #fff; margin-bottom: 10px;">You unlocked a new music rank:</p>
+  <p style="font-size: 0.9rem; color: #fff; margin-bottom: 10px;">You unlocked a new musical rank:</p>
   <div id="newBadgeDisplay" style="font-size: 1.2rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 16px;"></div>
   <button class="btn-primary" onclick="closeLevelModal()">Awesome! 🎸</button>
 </div>
 
 <script>
+  // FIREBASE CONFIGURATION - Replace with your keys if needed
   const firebaseConfig = {
     apiKey: "TUO_API_KEY",
     authDomain: "TUO_PROJECT_ID.firebaseapp.com",
@@ -215,20 +374,24 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
+  // SONG REPERTOIRE LIST
   const masterSongList = [
     { title: "Hotel California", artist: "Eagles" },
     { title: "Wish You Were Here", artist: "Pink Floyd" },
     { title: "Wonderwall", artist: "Oasis" },
-    { title: "Sultan of Swing", artist: "Dire Straits" },
-    { title: "Creep", artist: "Radiohead" }
+    { title: "Sultans of Swing", artist: "Dire Straits" },
+    { title: "Albachiara", artist: "Vasco Rossi" },
+    { title: "Ligabue Medley", artist: "Ligabue" },
+    { title: "Creep", artist: "Radiohead" },
+    { title: "L'Avvelenata", artist: "Francesco Guccini" }
   ];
 
-  // ENGLISH BADGES
+  // GAMIFICATION BADGES (English)
   const BADGES = [
-    { count: 1, title: "🎧 Tuned Listener" },
+    { count: 1, title: "🎟️ Tuned Spectator" },
     { count: 2, title: "🍻 Toast Companion" },
-    { count: 3, title: "💃 Dancefloor Starter" },
-    { count: 4, title: "🔥 Life of the Venue" },
+    { count: 3, title: "💃 Crowd Starter" },
+    { count: 4, title: "🔥 Soul of the Venue" },
     { count: 5, title: "⚡ Master of the Night" }
   ];
 
@@ -302,11 +465,25 @@
     document.getElementById('levelModal').classList.remove('active');
   }
 
+  // FIREBASE LISTENERS - ROBUST STATE CHECK
   function listenState() {
     db.ref('stato_concerto').on('value', (snap) => {
-      const isOnline = snap.val() === true;
-      document.getElementById('onlineSection').style.display = isOnline ? 'block' : 'none';
-      document.getElementById('offlineSection').style.display = isOnline ? 'none' : 'block';
+      const val = snap.val();
+      console.log("State received from Firebase:", val);
+
+      // Recognizes boolean true, or strings like "online", "true", "ON"
+      const isOnline = (val === true) || 
+                       (typeof val === 'string' && ['online', 'true', 'on'].includes(val.trim().toLowerCase()));
+
+      const onlineEl = document.getElementById('onlineSection');
+      const offlineEl = document.getElementById('offlineSection');
+
+      if (onlineEl && offlineEl) {
+        onlineEl.style.display = isOnline ? 'block' : 'none';
+        offlineEl.style.display = isOnline ? 'none' : 'block';
+      }
+    }, (error) => {
+      console.error("Error reading Firebase state:", error);
     });
   }
 
@@ -321,16 +498,18 @@
       highlightContainer.style.display = 'none';
 
       if (!dates) {
-        container.innerHTML = '<p style="font-size: 0.85rem; color: var(--text-sub);">No upcoming shows scheduled.</p>';
+        container.innerHTML = '<p style="font-size: 0.85rem; color: var(--text-sub);">No upcoming shows listed at the moment.</p>';
         return;
       }
 
       const dateArray = Object.values(dates);
       if (dateArray.length > 0) {
+        // Highlight first date
         const first = dateArray[0];
         highlightContainer.style.display = 'block';
         highlightContent.innerHTML = `<strong>${first.data}</strong> - ${first.locale} (${first.citta})`;
 
+        // Full list
         dateArray.forEach(d => {
           const div = document.createElement('div');
           div.className = 'date-item';
@@ -338,9 +517,12 @@
           container.appendChild(div);
         });
       }
+    }, (error) => {
+      console.error("Error reading upcoming dates:", error);
     });
   }
 
+  // RENDERING AND FILTERING SONGS
   function renderSongs(songs) {
     const container = document.getElementById('songList');
     container.innerHTML = '';
@@ -348,9 +530,9 @@
       const div = document.createElement('div');
       div.className = 'song-card';
       div.innerHTML = `
-        <div>
+        <div class="song-info">
           <h4>${song.title}</h4>
-          <p style="font-size:0.85rem; color:var(--text-sub);">${song.artist}</p>
+          <p>${song.artist}</p>
         </div>
         <button class="btn-small" style="background: rgba(0,242,254,0.15); border-color: rgba(0,242,254,0.3); color: var(--accent-cyan);" onclick="requestSong('${song.title.replace(/'/g, "\\'")}', '${song.artist.replace(/'/g, "\\'")}')">Request 🎵</button>
       `;
@@ -366,7 +548,7 @@
 
   function requestSong(title, artist) {
     if (!currentUserName) {
-      alert("Please enter your name above first!");
+      alert("Please enter your name at the top before requesting a song!");
       return;
     }
 
@@ -384,6 +566,8 @@
       alert(`Request sent successfully! 🎸`);
       document.getElementById('dedicaText').value = '';
       incrementInteraction();
+    }).catch(err => {
+      alert("Error sending request: " + err.message);
     });
   }
 
@@ -396,8 +580,10 @@
       utente: currentUserName || 'Anonymous',
       data: new Date().toLocaleDateString()
     }).then(() => {
-      alert("Thanks for your suggestion! We'll consider it for upcoming shows 🎶");
+      alert("Thanks for your suggestion! We'll keep it in mind for upcoming setlists 🎶");
       document.getElementById('offSongTitle').value = '';
+    }).catch(err => {
+      alert("Error sending suggestion: " + err.message);
     });
   }
 </script>
