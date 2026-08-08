@@ -26,6 +26,12 @@
     .song-info { display: flex; flex-direction: column; }
     .song-title { font-weight: bold; font-size: 1em; }
     .song-artist { font-size: 0.85em; color: var(--subtext); }
+    
+    .upcoming-item { padding: 10px 0; border-bottom: 1px solid #333; display: flex; flex-direction: column; gap: 3px; }
+    .upcoming-item:last-child { border-bottom: none; }
+    .upcoming-date { font-weight: bold; color: var(--primary); font-size: 0.95em; }
+    .upcoming-venue { font-size: 0.9em; color: #fff; }
+
     input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; box-sizing: border-box; }
     button { background: var(--primary); color: #000; font-weight: bold; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
     button:active { opacity: 0.8; }
@@ -100,6 +106,14 @@
     
     <label for="dedica" style="font-weight: bold; margin-top: 15px; display: block;">Dedica o messaggio (opzionale):</label>
     <input type="text" id="dedica" placeholder="Es. Per Anna">
+  </div>
+
+  <!-- PROSSIMI LIVE SECTION -->
+  <div class="section">
+    <h2>📅 Prossimi Live</h2>
+    <div id="upcoming-list">
+      <p style="text-align: center; color: var(--subtext); font-size: 0.9em; padding: 10px 0;">Nessun live in programma al momento.</p>
+    </div>
   </div>
 
   <!-- TOP SOCIAL & PAYPAL SECTION -->
@@ -231,6 +245,7 @@
 
     const COOLDOWN_MS = 10 * 60 * 1000; // 10 Minuti
     const listContainer = document.getElementById('song-list');
+    const upcomingContainer = document.getElementById('upcoming-list');
     const searchBar = document.getElementById('searchBar');
     const timerBanner = document.getElementById('timerBanner');
     const concertEndBanner = document.getElementById('concertEndBanner');
@@ -269,6 +284,26 @@
       userNameInput.focus();
     };
 
+    // Ascolta i prossimi live in tempo reale da Firebase
+    onValue(ref(db, 'prossimi_live'), (snapshot) => {
+      const data = snapshot.val();
+      upcomingContainer.innerHTML = '';
+      if (!data) {
+        upcomingContainer.innerHTML = '<p style="text-align: center; color: var(--subtext); font-size: 0.9em; padding: 10px 0;">Nessun live in programma al momento.</p>';
+        return;
+      }
+      Object.keys(data).forEach(key => {
+        const item = data[key];
+        const div = document.createElement('div');
+        div.className = 'upcoming-item';
+        div.innerHTML = `
+          <span class="upcoming-date">📅 ${item.date}</span>
+          <span class="upcoming-venue">📍 ${item.venue}</span>
+        `;
+        upcomingContainer.appendChild(div);
+      });
+    });
+
     // Funzione per renderizzare la lista dei brani con supporto ricerca
     function renderSongs(filter = '') {
       listContainer.innerHTML = '';
@@ -303,12 +338,10 @@
       }
     }
 
-    // Ascolta eventi sulla barra di ricerca
     searchBar.addEventListener('input', (e) => {
       renderSongs(e.target.value);
     });
 
-    // Ascolta lo stato del concerto in tempo reale
     onValue(ref(db, 'concerto_chiuso'), (snapshot) => {
       concertClosed = snapshot.val() === true;
       if (concertClosed) {
@@ -354,7 +387,6 @@
       buttons.forEach(btn => btn.disabled = disabled);
     }
 
-    // Inizializzazione scaletta
     renderSongs();
     updateTimer();
     timerInterval = setInterval(updateTimer, 1000);
