@@ -17,6 +17,9 @@
     .timer-banner { display: none; background: #002b3d; border: 1px solid var(--primary); color: #80deea; padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; margin-bottom: 20px; font-size: 0.95em; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
     .timer-banner span { display: block; font-size: 1.2em; color: #fff; margin-top: 4px; }
 
+    /* Concert End Banner */
+    .concert-end-banner { display: none; background: #c62828; border: 1px solid #ff5252; color: #fff; padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; margin-bottom: 20px; font-size: 0.95em; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
     .section { background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
     .song-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #333; }
     .song-item:last-child { border-bottom: none; }
@@ -64,6 +67,11 @@
 
   <div class="lang-switch">
     <a href="index.html">🇮🇹 Passa all'Italiano</a>
+  </div>
+
+  <!-- CONCERT END BANNER -->
+  <div id="concertEndBanner" class="concert-end-banner">
+    ⚠️ The concert is about to end! Song requests are temporarily disabled.
   </div>
 
   <!-- TOP TIMER BANNER -->
@@ -115,7 +123,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyDqH7id1aRXulq9CfVjLn9TDu4QYX9Paao",
@@ -222,12 +230,14 @@
     const COOLDOWN_MS = 10 * 60 * 1000; // 10 Minutes
     const listContainer = document.getElementById('song-list');
     const timerBanner = document.getElementById('timerBanner');
+    const concertEndBanner = document.getElementById('concertEndBanner');
     const countdownEl = document.getElementById('countdown');
     const nameInputContainer = document.getElementById('nameInputContainer');
     const nameDisplayContainer = document.getElementById('nameDisplayContainer');
     const userNameInput = document.getElementById('userName');
     const displayNameSpan = document.getElementById('displayName');
     let timerInterval = null;
+    let concertClosed = false;
 
     // Handle saved name on startup
     const savedName = localStorage.getItem('dual_shock_user_name');
@@ -269,7 +279,22 @@
       listContainer.appendChild(item);
     });
 
+    // Listen to concert status in real-time
+    onValue(ref(db, 'concerto_chiuso'), (snapshot) => {
+      concertClosed = snapshot.val() === true;
+      if (concertClosed) {
+        concertEndBanner.style.display = 'block';
+        timerBanner.style.display = 'none';
+        setButtonsDisabled(true);
+      } else {
+        concertEndBanner.style.display = 'none';
+        updateTimer();
+      }
+    });
+
     function updateTimer() {
+      if (concertClosed) return;
+
       const lastRequest = localStorage.getItem('last_song_request_time');
       if (!lastRequest) {
         timerBanner.style.display = 'none';
@@ -304,6 +329,11 @@
     timerInterval = setInterval(updateTimer, 1000);
 
     window.seleziona = (titolo, artista) => {
+      if (concertClosed) {
+        alert('⚠️ The concert is about to end or has finished, new requests cannot be sent.');
+        return;
+      }
+
       let name = localStorage.getItem('dual_shock_user_name') || userNameInput.value.trim();
       if(!name) {
         alert('Please enter your name at the top before picking a song!');
@@ -311,7 +341,6 @@
         return;
       }
 
-      // Automatically save if entered via input without explicitly clicking save
       localStorage.setItem('dual_shock_user_name', name);
 
       const lastRequest = localStorage.getItem('last_song_request_time');
