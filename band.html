@@ -107,7 +107,7 @@
   <h1>📡 Dashboard Palco</h1>
 
   <!-- PULSANTE STATO CONCERTO -->
-  <button id="btnConcerto" class="btn-concert" onclick="toggleConcerto()" style="background: #4caf50; color: #fff;">🟢 Inizio Concerto (Attivo)</button>
+  <button id="btnConcerto" class="btn-concert" onclick="toggleConcerto()">🟢 Inizia Concerto</button>
 
   <button class="btn-clear-all" onclick="svuotaTutto()">🗑️ Azzera tutte le richieste attive</button>
 
@@ -126,7 +126,7 @@
     <button onclick="azzeraStorico()" style="background: #d32f2f; color: #fff; width: 100%; margin-top: 10px;">🗑️ Azzera Storico</button>
   </div>
 
-  <!-- SEZIONE GESTIONE PROSSIMI LIVE (SPOSTATA IN FONDO CON BLOCCHI SEPARATI) -->
+  <!-- SEZIONE GESTIONE PROSSIMI LIVE IN FONDO CON BLOCCHI SEPARATI -->
   <div class="section">
     <h2>📅 Gestione Prossimi Live</h2>
     <label style="font-weight: bold; color: var(--primary);">Data concerto:</label>
@@ -171,22 +171,24 @@
     const btnConcerto = document.getElementById('btnConcerto');
     const bandShowsList = document.getElementById('band-shows-list');
 
+    // Gestione stato concerto (chiuso = true, attivo = false)
     onValue(ref(db, 'concerto_chiuso'), (snapshot) => {
       const chiuso = snapshot.val() === true;
       if(chiuso) {
-        btnConcerto.style.background = '#f44336';
-        btnConcerto.style.color = '#fff';
-        btnConcerto.innerText = '🔴 Fine Concerto (Clicca per riattivare)';
-      } else {
         btnConcerto.style.background = '#4caf50';
         btnConcerto.style.color = '#fff';
-        btnConcerto.innerText = '🟢 Inizio Concerto (Attivo)';
+        btnConcerto.innerText = '🟢 Inizia Concerto (Clicca per riattivare)';
+      } else {
+        btnConcerto.style.background = '#f44336';
+        btnConcerto.style.color = '#fff';
+        btnConcerto.innerText = '🔴 Fine Concerto (Clicca per bloccare)';
       }
     });
 
     window.toggleConcerto = () => {
-      const nuovoStato = btnConcerto.innerText.includes('Inizio');
-      set(ref(db, 'concerto_chiuso'), nuovoStato);
+      const isCurrentlyClosed = btnConcerto.innerText.includes('Inizia');
+      // Se era chiuso, ora deve aprirsi (false); se era aperto, ora deve chiudersi (true)
+      set(ref(db, 'concerto_chiuso'), !isCurrentlyClosed);
     };
 
     onValue(ref(db, 'richiesta_live'), (snapshot) => {
@@ -268,9 +270,9 @@
       }
 
       push(ref(db, 'prossimi_live'), {
-        data: data,
-        locale: locale,
-        citta: citta,
+        date: data,
+        venue: locale,
+        city: citta,
         timestamp: Date.now()
       }).then(() => {
         document.getElementById('showData').value = '';
@@ -295,9 +297,9 @@
         div.className = 'card';
         div.style.borderLeftColor = '#ffc107';
         div.innerHTML = `
-          <div>📅 <strong>${show.data}</strong></div>
-          <div>📍 Locale: <strong>${show.locale}</strong></div>
-          <div>🏙️ Città: <strong>${show.citta}</strong></div>
+          <div>📅 <strong>${show.date}</strong></div>
+          <div>📍 Locale: <strong>${show.venue}</strong></div>
+          <div>🏙️ Città: <strong>${show.city}</strong></div>
           <button onclick="eliminaLive('${key}')" style="background: #f44336; color: #fff; padding: 6px 10px; margin-top: 8px; align-self: flex-start;">🗑️ Elimina</button>
         `;
         bandShowsList.appendChild(div);
